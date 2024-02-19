@@ -31,8 +31,8 @@ public class NNTrainPatterns : NNForwardPropagation
     double _dMSE = 0;
     int _nn;
     double _dMSE200 = 0;
-    private MnistDatabase _MnistDataSet;
-    Mainform _form;
+    private readonly MnistDatabase _MnistDataSet;
+    readonly Mainform _form;
     /// <summary>
     /// 
     /// </summary>

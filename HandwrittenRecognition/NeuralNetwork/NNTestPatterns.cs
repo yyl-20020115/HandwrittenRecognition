@@ -4,14 +4,14 @@ using System.Threading;
 using NeuralNetworkLibrary;
 namespace HandwrittenRecogniration;
 
-public class NNTestPatterns : NeuralNetworkLibrary.NNForwardPropagation
+public class NNTestPatterns : NNForwardPropagation
 {
 
     #region Parametters
-    private MnistDatabase _MnistDataSet;
+    private readonly MnistDatabase _MnistDataSet;
     private uint _iMisNum;
     private uint _iNextPattern;
-    Mainform _form;
+    readonly Mainform _form;
     #endregion
     public NNTestPatterns(NeuralNetwork neuronNet, MnistDatabase testtingSet, Preferences preferences, bool testingDataReady,
                         ManualResetEvent eventStop,
