@@ -125,10 +125,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="t10k-images-idx3-ubyte" />
-    <None Include="t10k-labels-idx1-ubyte" />
-    <None Include="train-images-idx3-ubyte" />
-    <None Include="train-labels-idx1-ubyte" />
+    <None Include="t10k-images.idx3-ubyte" />
+    <None Include="t10k-labels.idx1-ubyte" />
+    <None Include="train-images.idx3-ubyte" />
+    <None Include="train-labels.idx1-ubyte" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NeuralNetworkLibrary\NeuralNetworkLibrary.csproj">
