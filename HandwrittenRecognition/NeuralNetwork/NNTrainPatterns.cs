@@ -43,7 +43,7 @@ public class NNTrainPatterns : NNForwardPropagation
     public NNTrainPatterns(NeuralNetwork neuronNet, MnistDatabase trainingSet, Preferences preferences, bool trainingDataReady,
                         ManualResetEvent eventStop,
                         ManualResetEvent eventStopped,
-                        HandwrittenRecogniration.Mainform form, List<Mutex> mutexs)
+                        Mainform form, List<Mutex> mutexs)
     {
         m_currentPatternIndex = 0;
         _bDataReady = trainingDataReady;
@@ -390,7 +390,7 @@ public class NNTrainPatterns : NNForwardPropagation
                 _MnistDataSet.RandomizePatternSequence();
             }
             byte[] grayLevels = new byte[m_Preferences.m_nRowsImages * m_Preferences.m_nColsImages];
-            int ipattern = _MnistDataSet.GetNextPatternNumber(_MnistDataSet.m_bFromRandomizedPatternSequence);
+            int ipattern = _MnistDataSet.GetNextPatternNumber(_MnistDataSet.BFromRandomizedPatternSequence);
             _MnistDataSet.m_pImagePatterns[ipattern].pPattern.CopyTo(grayLevels, 0);
             label = _MnistDataSet.m_pImagePatterns[ipattern].nLabel;
             _iNextPattern++;

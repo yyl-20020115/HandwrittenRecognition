@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 
 namespace NeuralNetworkLibrary;
 
-/// <PARAM name="INIPath"></PARAM>
-public class IniFile(string INIPath)
+/// <PARAM name="IniPath"></PARAM>
+public class IniFile(string IniPath)
 {
-    public string path = INIPath;
+    public string Path = IniPath;
 
     [DllImport("kernel32")]
     private static extern long WritePrivateProfileString(string section,
@@ -37,7 +37,7 @@ public class IniFile(string INIPath)
 
     public void IniWriteValue(string Section, string Key, string Value)
     {
-        WritePrivateProfileString(Section, Key, Value, this.path);
+        WritePrivateProfileString(Section, Key, Value, this.Path);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class IniFile(string INIPath)
     public string IniReadValue(string Section, string Key)
     {
         var builder = new StringBuilder(255);
-        int i = GetPrivateProfileString(Section, Key, "", builder, 255, this.path);
+        int i = GetPrivateProfileString(Section, Key, "", builder, 255, this.Path);
         return builder.ToString();
 
     }

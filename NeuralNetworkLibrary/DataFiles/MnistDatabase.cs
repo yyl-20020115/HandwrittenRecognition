@@ -46,21 +46,8 @@ public class MnistDatabase
     protected System.IO.BinaryReader load_LabelFile_stream;
 
     public List<ImagePattern> m_pImagePatterns;
-    public bool m_bFromRandomizedPatternSequence
-    {
-        get
-        {
-            return _bFromRandomizedPatternSequence;
-        }
-
-    }
-    public bool m_bDatabaseReady
-    {
-        get
-        {
-            return _bDatabase;
-        }
-    }
+    public bool BFromRandomizedPatternSequence => _bFromRandomizedPatternSequence;
+    public bool BDatabaseReady => _bDatabase;
 
     public MnistDatabase()
     {

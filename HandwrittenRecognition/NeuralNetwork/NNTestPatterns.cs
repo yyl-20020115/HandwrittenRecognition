@@ -16,7 +16,7 @@ public class NNTestPatterns : NNForwardPropagation
     public NNTestPatterns(NeuralNetwork neuronNet, MnistDatabase testtingSet, Preferences preferences, bool testingDataReady,
                         ManualResetEvent eventStop,
                         ManualResetEvent eventStopped,
-                        HandwrittenRecogniration.Mainform form, List<Mutex> mutexs)
+                        Mainform form, List<Mutex> mutexs)
     {
         m_currentPatternIndex = 0;
         _bDataReady = testingDataReady;
