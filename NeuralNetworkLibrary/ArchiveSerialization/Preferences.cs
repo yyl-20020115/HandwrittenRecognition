@@ -106,46 +106,46 @@ public class Preferences
 
         tSection = "Neural Network Parameters";
 
-        Get(tSection, "Initial learning rate (eta)", out m_dInitialEtaLearningRate);
-        Get(tSection, "Minimum learning rate (eta)", out m_dMinimumEtaLearningRate);
-        Get(tSection, "Rate of decay for learning rate (eta)", out m_dLearningRateDecay);
-        Get(tSection, "Decay rate is applied after this number of backprops", out m_nAfterEveryNBackprops);
-        Get(tSection, "Number of backprop threads", out m_cNumBackpropThreads);
-        Get(tSection, "Number of testing threads", out m_cNumTestingThreads);
-        Get(tSection, "Number of patterns used to calculate Hessian", out m_nNumHessianPatterns);
-        Get(tSection, "Limiting divisor (micron) for learning rate amplification (like 0.10 for 10x limit)", out m_dMicronLimitParameter);
+        Get(tSection, "Initial learning rate (eta)", ref m_dInitialEtaLearningRate);
+        Get(tSection, "Minimum learning rate (eta)", ref m_dMinimumEtaLearningRate);
+        Get(tSection, "Rate of decay for learning rate (eta)", ref m_dLearningRateDecay);
+        Get(tSection, "Decay rate is applied after this number of backprops", ref m_nAfterEveryNBackprops);
+        Get(tSection, "Number of backprop threads", ref m_cNumBackpropThreads);
+        Get(tSection, "Number of testing threads", ref m_cNumTestingThreads);
+        Get(tSection, "Number of patterns used to calculate Hessian", ref m_nNumHessianPatterns);
+        Get(tSection, "Limiting divisor (micron) for learning rate amplification (like 0.10 for 10x limit)", ref m_dMicronLimitParameter);
 
 
         // Neural Network Viewer parameters
 
         tSection = "Neural Net Viewer Parameters";
 
-        Get(tSection, "Size of magnification window", out m_nMagWindowSize);
-        Get(tSection, "Magnification factor for magnification window", out m_nMagWindowMagnification);
+        Get(tSection, "Size of magnification window", ref m_nMagWindowSize);
+        Get(tSection, "Magnification factor for magnification window", ref m_nMagWindowMagnification);
 
 
         // MNIST data collection parameters
 
         tSection = "MNIST Database Parameters";
 
-        Get(tSection, "Training images magic number", out m_nMagicTrainingImages);
-        Get(tSection, "Training images item count", out m_nItemsTrainingImages);
-        Get(tSection, "Training labels magic number", out m_nMagicTrainingLabels);
-        Get(tSection, "Training labels item count", out m_nItemsTrainingLabels);
+        Get(tSection, "Training images magic number", ref m_nMagicTrainingImages);
+        Get(tSection, "Training images item count", ref m_nItemsTrainingImages);
+        Get(tSection, "Training labels magic number", ref m_nMagicTrainingLabels);
+        Get(tSection, "Training labels item count", ref m_nItemsTrainingLabels);
 
-        Get(tSection, "Testing images magic number", out m_nMagicTestingImages);
-        Get(tSection, "Testing images item count", out m_nItemsTestingImages);
-        Get(tSection, "Testing labels magic number", out m_nMagicTestingLabels);
-        Get(tSection, "Testing labels item count", out m_nItemsTestingLabels);
+        Get(tSection, "Testing images magic number", ref m_nMagicTestingImages);
+        Get(tSection, "Testing images item count", ref m_nItemsTestingImages);
+        Get(tSection, "Testing labels magic number", ref m_nMagicTestingLabels);
+        Get(tSection, "Testing labels item count", ref m_nItemsTestingLabels);
 
         // these two are basically ignored
 
         uint uiCount = g_cImageSize;
-        if(Get(tSection, "Rows per image", out uiCount))
+        if(Get(tSection, "Rows per image", ref uiCount))
             m_nRowsImages = uiCount;
 
         uiCount = g_cImageSize;
-        if(Get(tSection, "Columns per image", out uiCount))
+        if(Get(tSection, "Columns per image", ref uiCount))
             m_nColsImages = uiCount;
 
 
@@ -153,17 +153,57 @@ public class Preferences
 
         tSection = "Parameters for Controlling Pattern Distortion During Backpropagation";
 
-        Get(tSection, "Maximum scale factor change (percent, like 20.0 for 20%)", out m_dMaxScaling);
-        Get(tSection, "Maximum rotational change (degrees, like 20.0 for 20 degrees)", out m_dMaxRotation);
-        Get(tSection, "Sigma for elastic distortions (higher numbers are more smooth and less distorted; Simard uses 4.0)", out m_dElasticSigma);
-        Get(tSection, "Scaling for elastic distortions (higher numbers amplify distortions; Simard uses 0.34)", out m_dElasticScaling);
+        Get(tSection, "Maximum scale factor change (percent, like 20.0 for 20%)", ref m_dMaxScaling);
+        Get(tSection, "Maximum rotational change (degrees, like 20.0 for 20 degrees)", ref m_dMaxRotation);
+        Get(tSection, "Sigma for elastic distortions (higher numbers are more smooth and less distorted; Simard uses 4.0)", ref m_dElasticSigma);
+        Get(tSection, "Scaling for elastic distortions (higher numbers amplify distortions; Simard uses 0.34)", ref m_dElasticScaling);
     }
-    private bool Get(string lpAppName, string lpKeyName, out int nDefault) => int.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out nDefault);
-    private bool Get(string lpAppName, string lpKeyName, out uint nDefault) => uint.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out nDefault);
-    private bool Get(string lpAppName, string lpKeyName, out double nDefault) => double.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out nDefault);
-    private bool Get(string lpAppName, string lpKeyName, out byte nDefault) => byte.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out nDefault);
+    private bool Get(string lpAppName, string lpKeyName, ref int nDefault)
+    {
+        var r = int.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out var d);
+        if (r)
+        {
+            nDefault = d;
+        }
+        return false;
+    }
+    private bool Get(string lpAppName, string lpKeyName, ref uint nDefault)
+    {
+        var r = uint.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out var d);
+        if (r)
+        {
+            nDefault = d;
+        }
+        return false;
+    }
 
-    private bool Get(string lpAppName, string lpKeyName, out string nDefault) => !string.IsNullOrEmpty(nDefault = m_Inifile.IniReadValue(lpAppName, lpKeyName));
-    private bool Get(string lpAppName, string lpKeyName, out bool nDefault) => bool.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out nDefault);
+    private bool Get(string lpAppName, string lpKeyName, ref double nDefault) 
+    {
+        var r = double.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out var d);
+        if (r)
+        {
+            nDefault = d;
+        }
+        return false;
+    }
+    private bool Get(string lpAppName, string lpKeyName, ref byte nDefault) {
+        var r = byte.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out var d);
+        if (r)
+        {
+            nDefault = d;
+        }
+        return false;
+    }
+
+    private bool Get(string lpAppName, string lpKeyName, ref string nDefault) => !string.IsNullOrEmpty(nDefault = m_Inifile.IniReadValue(lpAppName, lpKeyName));
+    private bool Get(string lpAppName, string lpKeyName, ref bool nDefault) 
+    {
+        var r = bool.TryParse(m_Inifile.IniReadValue(lpAppName, lpKeyName), out var d);
+        if (r)
+        {
+            nDefault = d;
+        }
+        return false;
+    }
 
 }
