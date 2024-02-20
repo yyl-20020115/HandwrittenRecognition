@@ -25,14 +25,12 @@ public class NNNeuron : IArchiveSerialization
     {
         Label = str;
         Output = 0.0;
-        Connections = new NNConnectionList(icount);
+        Connections = new (icount);
         Initialize();
     }
     public void AddConnection(uint iNeuron, uint iWeight)
     {
-        NNConnection conn = new(iNeuron, iWeight);
-        Connections.Add(conn);
-
+        AddConnection(new(iNeuron, iWeight));
     }
     public void AddConnection(NNConnection conn)
     {

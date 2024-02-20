@@ -16,7 +16,7 @@ public class NNForwardPropagation
     // Worker thread sets this event when it is stopped:
     public ManualResetEvent StoppedEvent = null;
     public List<Mutex> Mutexs;
-    public HiPerfTimer Timer;
+    public HiPerformanceTimer Timer;
     public uint ImageCount;
     public int CurrentPatternIndex;
     public Preferences Preferences { get; set; }
@@ -34,7 +34,7 @@ public class NNForwardPropagation
     protected int Rows;
     protected int Count;
     //double m_GaussianKernel[ GAUSSIAN_FIELD_SIZE ] [ GAUSSIAN_FIELD_SIZE ];
-    readonly double[,] GaussianKernel = new double[DefaultDefinations.GAUSSIAN_FIELD_SIZE, DefaultDefinations.GAUSSIAN_FIELD_SIZE];
+    readonly double[,] GaussianKernel = new double[Defaults.GAUSSIAN_FIELD_SIZE, Defaults.GAUSSIAN_FIELD_SIZE];
 
     public NeuralNetwork NeuralNetwork
     {

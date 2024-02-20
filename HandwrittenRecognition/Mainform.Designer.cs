@@ -1,6 +1,6 @@
 ﻿namespace HandwrittenRecogniration
 {
-    partial class Mainform
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -15,7 +15,7 @@
         {
             if (disposing && (components != null))
             {
-                _MainMutex.Dispose();
+                MainMutex.Dispose();
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -126,14 +126,14 @@
             this.networkParametersToolStripMenuItem.Name = "networkParametersToolStripMenuItem";
             this.networkParametersToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.networkParametersToolStripMenuItem.Text = "Network Parameters";
-            this.networkParametersToolStripMenuItem.Click += new System.EventHandler(this.networkParametersToolStripMenuItem_Click);
+            this.networkParametersToolStripMenuItem.Click += new System.EventHandler(this.NetworkParametersToolStripMenuItem_Click);
             // 
             // mNISTDatabaseToolStripMenuItem
             // 
             this.mNISTDatabaseToolStripMenuItem.Name = "mNISTDatabaseToolStripMenuItem";
             this.mNISTDatabaseToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.mNISTDatabaseToolStripMenuItem.Text = "MNIST Database";
-            this.mNISTDatabaseToolStripMenuItem.Click += new System.EventHandler(this.mNISTDatabaseToolStripMenuItem_Click);
+            this.mNISTDatabaseToolStripMenuItem.Click += new System.EventHandler(this.MNISTDatabaseToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -331,7 +331,7 @@
             this.buttonMnistNext.TabIndex = 2;
             this.buttonMnistNext.Text = "Next";
             this.buttonMnistNext.UseVisualStyleBackColor = true;
-            this.buttonMnistNext.Click += new System.EventHandler(this.next_Click);
+            this.buttonMnistNext.Click += new System.EventHandler(this.Next_Click);
             // 
             // label6
             // 
@@ -351,7 +351,7 @@
             this.buttonMnistPrevious.TabIndex = 4;
             this.buttonMnistPrevious.Text = "Previous";
             this.buttonMnistPrevious.UseVisualStyleBackColor = true;
-            this.buttonMnistPrevious.Click += new System.EventHandler(this.previous_Click);
+            this.buttonMnistPrevious.Click += new System.EventHandler(this.Previous_Click);
             // 
             // label5
             // 
@@ -477,7 +477,7 @@
             this.radioButtonTestingdatabase.TabStop = true;
             this.radioButtonTestingdatabase.Text = "Testing database";
             this.radioButtonTestingdatabase.UseVisualStyleBackColor = true;
-            this.radioButtonTestingdatabase.CheckedChanged += new System.EventHandler(this.radioButtonTestingdatabase_CheckedChanged);
+            this.radioButtonTestingdatabase.CheckedChanged += new System.EventHandler(this.RadioButtonTestingdatabase_CheckedChanged);
             // 
             // radioButtonTrainingdatabase
             // 
@@ -515,7 +515,7 @@
             this.buttonMnistStopTest.TabIndex = 2;
             this.buttonMnistStopTest.Text = "Stop Mnist Test";
             this.buttonMnistStopTest.UseVisualStyleBackColor = true;
-            this.buttonMnistStopTest.Click += new System.EventHandler(this.buttonStopMnistTest_Click);
+            this.buttonMnistStopTest.Click += new System.EventHandler(this.ButtonStopMnistTest_Click);
             // 
             // buttonMnistTest
             // 
@@ -525,7 +525,7 @@
             this.buttonMnistTest.TabIndex = 1;
             this.buttonMnistTest.Text = "Start Mnist Test";
             this.buttonMnistTest.UseVisualStyleBackColor = true;
-            this.buttonMnistTest.Click += new System.EventHandler(this.buttonMnistTest_Click);
+            this.buttonMnistTest.Click += new System.EventHandler(this.ButtonMnistTest_Click);
             // 
             // listBox2
             // 

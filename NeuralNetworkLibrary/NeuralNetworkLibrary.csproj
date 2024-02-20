@@ -57,7 +57,7 @@
     <Compile Include="ArchiveSerialization\IMfcArchiveSerialization.cs" />
     <Compile Include="ArchiveSerialization\MfcArchive.cs" />
     <Compile Include="ArchiveSerialization\MfcStringReader.cs" />
-    <Compile Include="DefaultDefinations.cs" />
+    <Compile Include="Defaults.cs" />
     <Compile Include="NeuralNetwork\DErrorsList.cs" />
     <Compile Include="NeuralNetwork\NeuralNetwork .cs" />
     <Compile Include="NeuralNetwork\NNForwardPropagation.cs" />
@@ -65,7 +65,7 @@
     <Compile Include="NNConnections\NNConnectionList.cs" />
     <Compile Include="NNLayers\NNLayer.cs" />
     <Compile Include="NNLayers\NNLayerList.cs" />
-    <Compile Include="HiPerfTimer.cs" />
+    <Compile Include="HiPerformanceTimer.cs" />
     <Compile Include="NNNeurons\NNNeuron.cs" />
     <Compile Include="NNNeurons\NNNeuronList.cs" />
     <Compile Include="NNNeurons\NNNeuronOutputList.cs" />

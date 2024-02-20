@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.ComponentModel;
 namespace NeuralNetworkLibrary;
 
-public class HiPerfTimer
+public class HiPerformanceTimer
 {
     [DllImport("Kernel32.dll")]
     private static extern bool QueryPerformanceCounter(
@@ -21,7 +21,7 @@ public class HiPerfTimer
     public bool BStoped { get; private set; }
     // Constructor
 
-    public HiPerfTimer()
+    public HiPerformanceTimer()
     {
         startTime = 0;
         stopTime = 0;
@@ -58,7 +58,7 @@ public class HiPerfTimer
     }
 
     public override bool Equals(object obj) 
-        => obj is HiPerfTimer timer &&
+        => obj is HiPerformanceTimer timer &&
                freq == timer.freq;
     public override int GetHashCode() => freq.GetHashCode();
     // Returns the duration of the timer (in seconds)

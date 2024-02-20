@@ -11,12 +11,12 @@ public class NNTestPatterns : NNForwardPropagation
     private readonly MnistDatabase MnistDataSet;
     private uint MnistNum;
     private uint NextPattern;
-    readonly Mainform MainForm;
+    readonly MainForm MainForm;
     #endregion
     public NNTestPatterns(NeuralNetwork neuronNet, MnistDatabase testtingSet, Preferences preferences, bool testingDataReady,
                         ManualResetEvent eventStop,
                         ManualResetEvent eventStopped,
-                        Mainform form, List<Mutex> mutexs)
+                        MainForm form, List<Mutex> mutexs)
     {
         CurrentPatternIndex = 0;
         IsDataReady = testingDataReady;
@@ -25,8 +25,8 @@ public class NNTestPatterns : NNForwardPropagation
         StopEvent = eventStop;
         StoppedEvent = eventStopped;
         MainForm = form;
-        Timer = new HiPerfTimer();
-        ImageCount = (uint)testtingSet.m_pImagePatterns.Count;
+        Timer = new ();
+        ImageCount = (uint)testtingSet.ImagePatterns.Count;
 
         //Initialize Gaussian Kernel
         Preferences = preferences;
@@ -35,7 +35,7 @@ public class NNTestPatterns : NNForwardPropagation
         Mutexs = mutexs;
     }
     public NNTestPatterns(NeuralNetwork neuronNet, Preferences preferences,
-                        HandwrittenRecogniration.Mainform form, List<Mutex> mutexs)
+                        HandwrittenRecogniration.MainForm form, List<Mutex> mutexs)
     {
         CurrentPatternIndex = 0;
         IsDataReady = true;
@@ -90,8 +90,8 @@ public class NNTestPatterns : NNForwardPropagation
 
             byte[] grayLevels = new byte[Preferences.RowsImages * Preferences.ColsImages];
             //iSequentialNum = m_MnistDataSet.GetCurrentPatternNumber(m_MnistDataSet.m_bFromRandomizedPatternSequence);
-            MnistDataSet.m_pImagePatterns[(int)NextPattern].pPattern.CopyTo(grayLevels, 0);
-            label = MnistDataSet.m_pImagePatterns[(int)NextPattern].nLabel;
+            MnistDataSet.ImagePatterns[(int)NextPattern].Pattern.CopyTo(grayLevels, 0);
+            label = MnistDataSet.ImagePatterns[(int)NextPattern].Label;
             if (label < 0) label = 0;
             if (label > 9) label = 9;
 
@@ -104,11 +104,11 @@ public class NNTestPatterns : NNForwardPropagation
 
             // top row of inputVector is left as zero, left-most column is left as zero 
 
-            for (ii = 0; ii < DefaultDefinations.g_cImageSize; ++ii)
+            for (ii = 0; ii < Defaults.Global_ImageSize; ++ii)
             {
-                for (jj = 0; jj < DefaultDefinations.g_cImageSize; ++jj)
+                for (jj = 0; jj < Defaults.Global_ImageSize; ++jj)
                 {
-                    inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + DefaultDefinations.g_cImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
+                    inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + Defaults.Global_ImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
                 }
             }
 
@@ -141,15 +141,14 @@ public class NNTestPatterns : NNForwardPropagation
                 MnistNum++;
                 s = "Pattern No:" + NextPattern.ToString() + " Recognized value:" + iBestIndex.ToString() + " Actual value:" + label.ToString();
                 if (MainForm != null)
-                    MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 6, s });
+                    MainForm.Invoke(MainForm.DelegateAddObject, new Object[] { 6, s });
 
 
             }
             else
             {
                 s = NextPattern.ToString() + ", Mis Nums:" + MnistNum.ToString();
-                if (MainForm != null)
-                    MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 7, s });
+                MainForm?.Invoke(MainForm.DelegateAddObject, new Object[] { 7, s });
             }
             // check if thread is cancelled
             if (StopEvent.WaitOne(0, true))
@@ -162,7 +161,7 @@ public class NNTestPatterns : NNForwardPropagation
                 // To make asynchronous call use BeginInvoke
                 if (MainForm != null)
                 {
-                    MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 8, s });
+                    MainForm.Invoke(MainForm.DelegateAddObject, new Object[] { 8, s });
                 }
 
                 // inform main thread that this thread stopped
@@ -175,7 +174,7 @@ public class NNTestPatterns : NNForwardPropagation
         }
         {
             string s = String.Format("Mnist Testing thread: {0} stoped", Thread.CurrentThread.Name);
-            MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 8, s });
+            MainForm.Invoke(MainForm.DelegateAddObject, new Object[] { 8, s });
         }
     }
     public void PatternRecognizingThread(int iPatternNo)
@@ -216,8 +215,8 @@ public class NNTestPatterns : NNForwardPropagation
             Timer.Start();
         }
         byte[] grayLevels = new byte[Preferences.RowsImages * Preferences.ColsImages];
-        MnistDataSet.m_pImagePatterns[iPatternNo].pPattern.CopyTo(grayLevels, 0);
-        label = MnistDataSet.m_pImagePatterns[iPatternNo].nLabel;
+        MnistDataSet.ImagePatterns[iPatternNo].Pattern.CopyTo(grayLevels, 0);
+        label = MnistDataSet.ImagePatterns[iPatternNo].Label;
         NextPattern++;
 
         if (label < 0) label = 0;
@@ -232,11 +231,11 @@ public class NNTestPatterns : NNForwardPropagation
 
         // top row of inputVector is left as zero, left-most column is left as zero 
 
-        for (ii = 0; ii < DefaultDefinations.g_cImageSize; ++ii)
+        for (ii = 0; ii < Defaults.Global_ImageSize; ++ii)
         {
-            for (jj = 0; jj < DefaultDefinations.g_cImageSize; ++jj)
+            for (jj = 0; jj < Defaults.Global_ImageSize; ++jj)
             {
-                inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + DefaultDefinations.g_cImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
+                inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + Defaults.Global_ImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
             }
         }
 
@@ -263,7 +262,7 @@ public class NNTestPatterns : NNForwardPropagation
         }
 
         string s = iBestIndex.ToString();
-        MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 2, s });
+        MainForm.Invoke(MainForm.DelegateAddObject, [2, s]);
         // check if thread is cancelled
         Mutexs[1].ReleaseMutex();
 
@@ -314,11 +313,11 @@ public class NNTestPatterns : NNForwardPropagation
 
         // top row of inputVector is left as zero, left-most column is left as zero 
 
-        for (ii = 0; ii < DefaultDefinations.g_cImageSize; ++ii)
+        for (ii = 0; ii < Defaults.Global_ImageSize; ++ii)
         {
-            for (jj = 0; jj < DefaultDefinations.g_cImageSize; ++jj)
+            for (jj = 0; jj < Defaults.Global_ImageSize; ++jj)
             {
-                inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + DefaultDefinations.g_cImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
+                inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + Defaults.Global_ImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
             }
         }
 
@@ -345,7 +344,7 @@ public class NNTestPatterns : NNForwardPropagation
         }
 
         string s = iBestIndex.ToString();
-        MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 1, s });
+        MainForm.Invoke(MainForm.DelegateAddObject, new Object[] { 1, s });
         // check if thread is cancelled
 
         Mutexs[1].ReleaseMutex();

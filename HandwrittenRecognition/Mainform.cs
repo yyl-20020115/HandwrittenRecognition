@@ -15,26 +15,26 @@ namespace HandwrittenRecogniration;
 public delegate void DelegateAddObject(int i, Object s);
 public delegate void DelegateThreadFinished();
 #endregion
-public partial class Mainform : Form
+public partial class MainForm : Form
 {
     //MNIST Data set
-    readonly MnistDatabase _MnistTrainingDatabase;
-    readonly MnistDatabase _MinstTestingDatabase;
-    private MnistDatabase _Mnistdatabase;
-    readonly Preferences _Preference;
+    readonly MnistDatabase MnistTrainingDatabase;
+    readonly MnistDatabase MinstTestingDatabase;
+    private MnistDatabase Mnistdatabase;
+    readonly Preferences Preference;
 
-    bool _bTrainingDataReady;
-    bool _bTestingDataReady;
-    bool _bDatabaseReady;
-    bool _bTrainingThreadRuning;
-    bool _bTestingThreadRuning;
-    NeuralNetwork _NN;
-    NeuralNetwork _TrainingNN;
+    bool IsTrainingDataReady;
+    bool IsTestingDataReady;
+    bool IsDatabaseReady;
+    bool IsTrainingThreadRuning;
+    bool IsTestingThreadRuning;
+    readonly NeuralNetwork NN;
+    readonly NeuralNetwork TrainingNN;
     /// <summary>
     /// 
     /// </summary>
     /// 
-    int _icurrentMnistPattern;
+    int CurrentMnistPattern;
     //static uint _iBackpropThreadIdentifier;  // static member used by threads to identify themselves
 
 
@@ -42,57 +42,57 @@ public partial class Mainform : Form
     //Thread
 
     // events used to stop worker thread
-    ManualResetEvent _EventTrainingStopThread;
-    ManualResetEvent _EventTrainingThreadStopped;
-    ManualResetEvent _EventTestingStopThread;
-    ManualResetEvent _EventTestingThreadStopped;
+    readonly ManualResetEvent EventTrainingStopThread;
+    readonly ManualResetEvent EventTrainingThreadStopped;
+    readonly ManualResetEvent EventTestingStopThread;
+    readonly ManualResetEvent EventTestingThreadStopped;
     //    
-    Mutex _MainMutex;
-    List<Thread> _trainer_threads;
-    List<Thread> _testing_threads;
+    Mutex MainMutex;
+    List<Thread> TrainerThreads;
+    List<Thread> TestingThreads;
     // Delegate instances used to cal user interface functions 
     // from worker thread:
-    public DelegateAddObject _DelegateAddObject;
-    public DelegateThreadFinished _DelegateThreadFinished;
+    public DelegateAddObject DelegateAddObject;
+    public DelegateThreadFinished DelegateThreadFinished;
 
     /// <summary>
     /// My Defines
     /// </summary>
-    string _mnistWeightsFile;
+    string MnistWeightsFile;
 
-    public Mainform()
+    public MainForm()
     {
 
         InitializeComponent();
-        _Preference = new Preferences();
-        _MnistTrainingDatabase = new MnistDatabase();
-        _MinstTestingDatabase = new MnistDatabase();
-        _Mnistdatabase = _MinstTestingDatabase;
-        _icurrentMnistPattern = 0;
-        _bTrainingDataReady = false;
-        _bTestingDataReady = false;
-        _bDatabaseReady = _bTestingDataReady;
+        Preference = new Preferences();
+        MnistTrainingDatabase = new MnistDatabase();
+        MinstTestingDatabase = new MnistDatabase();
+        Mnistdatabase = MinstTestingDatabase;
+        CurrentMnistPattern = 0;
+        IsTrainingDataReady = false;
+        IsTestingDataReady = false;
+        IsDatabaseReady = IsTestingDataReady;
         radioButtonMnistTestDatabase.Checked = true;
         radioButtonMnistTrainDatabase.Checked = false;
         pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
 
         //Create Neural net work
-        _NN = new NeuralNetwork();
-        _TrainingNN = new NeuralNetwork();
-        CreateNNNetWork(_NN);
+        NN = new ();
+        TrainingNN = new ();
+        CreateNNNetWork(NN);
         // initialize delegates
-        _DelegateAddObject = new DelegateAddObject(this.AddObject);
+        DelegateAddObject = new (this.AddObject);
 
         // initialize events
-        _EventTrainingStopThread = new ManualResetEvent(false);
-        _EventTrainingThreadStopped = new ManualResetEvent(false);
-        _EventTestingStopThread = new ManualResetEvent(false);
-        _EventTestingThreadStopped = new ManualResetEvent(false);
-        _trainer_threads = null;
-        _MainMutex = new Mutex();
-        _mnistWeightsFile = "";
-        _bTrainingThreadRuning = false;
-        _bTestingThreadRuning = false;
+        EventTrainingStopThread = new (false);
+        EventTrainingThreadStopped = new (false);
+        EventTestingStopThread = new (false);
+        EventTestingThreadStopped = new (false);
+        TrainerThreads = null;
+        MainMutex = new ();
+        MnistWeightsFile = "";
+        IsTrainingThreadRuning = false;
+        IsTestingThreadRuning = false;
     }
     private void AddObject(int iCondition, object value)
     {
@@ -121,7 +121,7 @@ public partial class Mainform : Form
                 break;
             case 8:
                 listBox2.Items.Add((string)value);
-                _bTestingThreadRuning = false;
+                IsTestingThreadRuning = false;
                 buttonMnistTest.Enabled = true;
                 radioButtonTestingdatabase.Enabled = true;
                 radioButtonTrainingdatabase.Enabled = true;
@@ -135,17 +135,16 @@ public partial class Mainform : Form
         };
     }
     //draw training pattern to picturebox
-    private void next_Click(object sender, EventArgs e)
+    private void Next_Click(object sender, EventArgs e)
     {
-        if (_bDatabaseReady)
+        if (IsDatabaseReady)
         {
-
-            if (_icurrentMnistPattern < _Mnistdatabase.m_pImagePatterns.Count - 1)
+            if (CurrentMnistPattern < Mnistdatabase.ImagePatterns.Count - 1)
             {
-                _icurrentMnistPattern++;
-                var bitmap = new Bitmap((int)DefaultDefinations.g_cImageSize, (int)DefaultDefinations.g_cImageSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                byte[] pArray = _Mnistdatabase.m_pImagePatterns[_icurrentMnistPattern].pPattern;
-                uint label = _Mnistdatabase.m_pImagePatterns[_icurrentMnistPattern].nLabel;
+                CurrentMnistPattern++;
+                var bitmap = new Bitmap((int)Defaults.Global_ImageSize, (int)Defaults.Global_ImageSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                byte[] pArray = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Pattern;
+                uint label = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Label;
                 label6.Text = label.ToString();
                 byte[] colors = new byte[4];
                 for (int i = 0; i < 28; i++)
@@ -163,8 +162,8 @@ public partial class Mainform : Form
                     }
                 }
                 pictureBox2.Image = bitmap;
-                ImagePatternRecognization(_icurrentMnistPattern);
-                label10.Text = _icurrentMnistPattern.ToString();
+                ImagePatternRecognization(CurrentMnistPattern);
+                label10.Text = CurrentMnistPattern.ToString();
 
 
             }
@@ -173,27 +172,27 @@ public partial class Mainform : Form
     }
     private void ImagePatternRecognization(int index)
     {
-        List<Mutex> mutexs = new List<Mutex>(2);
+        List<Mutex> mutexs = new(2);
         for (int i = 0; i < 2; i++)
         {
             var mutex = new Mutex();
             mutexs.Add(mutex);
         }
 
-        var NNTessing = new NNTestPatterns(_NN, _Mnistdatabase, _Preference, _bDatabaseReady, null, null, this, mutexs);
+        var NNTessing = new NNTestPatterns(NN, Mnistdatabase, Preference, IsDatabaseReady, null, null, this, mutexs);
         var thread = new Thread(() => NNTessing.PatternRecognizingThread(index));
         thread.Start();
     }
-    private void previous_Click(object sender, EventArgs e)
+    private void Previous_Click(object sender, EventArgs e)
     {
-        if (_bDatabaseReady)
+        if (IsDatabaseReady)
         {
-            if (_icurrentMnistPattern > 1)
+            if (CurrentMnistPattern > 1)
             {
-                _icurrentMnistPattern -= 1;
-                var bitmap = new Bitmap((int)DefaultDefinations.g_cImageSize, (int)DefaultDefinations.g_cImageSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                byte[] pArray = _Mnistdatabase.m_pImagePatterns[_icurrentMnistPattern].pPattern;
-                uint ulabel = _Mnistdatabase.m_pImagePatterns[_icurrentMnistPattern].nLabel;
+                CurrentMnistPattern -= 1;
+                var bitmap = new Bitmap((int)Defaults.Global_ImageSize, (int)Defaults.Global_ImageSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                byte[] pArray = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Pattern;
+                uint ulabel = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Label;
                 label6.Text = ulabel.ToString();
                 byte[] colors = new byte[4];
                 for (int i = 0; i < 28; i++)
@@ -211,14 +210,14 @@ public partial class Mainform : Form
                     }
                 }
                 pictureBox2.Image = bitmap;
-                ImagePatternRecognization(_icurrentMnistPattern);
-                label10.Text = _icurrentMnistPattern.ToString();
+                ImagePatternRecognization(CurrentMnistPattern);
+                label10.Text = CurrentMnistPattern.ToString();
             }
         }
     }
     private void StartBackPropagationbutton_Click(object sender, EventArgs e)
     {
-        if (_bTrainingDataReady)
+        if (IsTrainingDataReady)
             OnStartBackpropagation();
     }
     /// <summary>
@@ -226,37 +225,35 @@ public partial class Mainform : Form
     /// </summary>
     void OnStartBackpropagation()
     {
-        if ((_bTrainingDataReady) && (_bTrainingThreadRuning != true) && (_bTestingThreadRuning != true))
+        if ((IsTrainingDataReady) && (IsTrainingThreadRuning != true) && (IsTestingThreadRuning != true))
         {
-            using (var dlg = new BackPropagationParametersForm())
+            using var dlg = new BackPropagationParametersForm();
+            var parameters = new BackPropagationParameters
             {
-                BackPropagationParameters parameters = new BackPropagationParameters
+                NumThreads = (uint)Preference.NumBackpropThreads,
+                InitialEta = Preference.InitialEtaLearningRate,
+                MinimumEta = Preference.MinimumEtaLearningRate,
+                EtaDecay = Preference.LearningRateDecay,
+                AfterEvery = Preference.AfterEveryNBackprops,
+                StartingPattern = 0,
+                EstimatedCurrentMSE = 0.10,
+                UseDistortPatterns = true
+            };
+            double eta = parameters.InitialEta;
+            parameters.InitialEtaMessage = String.Format("Initial Learning Rate eta (currently, eta = {0})", eta);
+            int curPattern = 0;
+            parameters.StartingPatternNum = String.Format("Starting Pattern Number (currently at {0})", curPattern);
+            dlg.SetBackProParameters(parameters);
+            var m_result = dlg.ShowDialog();
+            if (m_result == DialogResult.OK)
+            {
+                parameters = dlg.GetBackProParameters();
+                bool bRet = StartBackpropagation(parameters.StartingPattern, parameters.NumThreads, parameters.InitialEta,
+                    parameters.MinimumEta, parameters.EtaDecay, parameters.AfterEvery, parameters.UseDistortPatterns, parameters.EstimatedCurrentMSE);
+                if (bRet != false)
                 {
-                    NumThreads = (uint)_Preference.NumBackpropThreads,
-                    InitialEta = _Preference.InitialEtaLearningRate,
-                    MinimumEta = _Preference.MinimumEtaLearningRate,
-                    EtaDecay = _Preference.LearningRateDecay,
-                    AfterEvery = _Preference.AfterEveryNBackprops,
-                    StartingPattern = 0,
-                    EstimatedCurrentMSE = 0.10,
-                    UseDistortPatterns = true
-                };
-                double eta = parameters.InitialEta;
-                parameters.InitialEtaMessage = String.Format("Initial Learning Rate eta (currently, eta = {0})", eta);
-                int curPattern = 0;
-                parameters.StartingPatternNum = String.Format("Starting Pattern Number (currently at {0})", curPattern);
-                dlg.SetBackProParameters(parameters);
-                var m_result = dlg.ShowDialog();
-                if (m_result == DialogResult.OK)
-                {
-                    parameters = dlg.GetBackProParameters();
-                    bool bRet = StartBackpropagation(parameters.StartingPattern, parameters.NumThreads, parameters.InitialEta,
-                        parameters.MinimumEta, parameters.EtaDecay, parameters.AfterEvery, parameters.UseDistortPatterns, parameters.EstimatedCurrentMSE);
-                    if (bRet != false)
-                    {
-                        //do some thing
-                        _bTrainingThreadRuning = true;
-                    }
+                    //do some thing
+                    IsTrainingThreadRuning = true;
                 }
             }
         }
@@ -271,35 +268,34 @@ public partial class Mainform : Form
         if (iNumThreads > 10)  // 10 is arbitrary upper limit
             iNumThreads = 10;
         //initialize BackPropagation before process
-        _NN.EtaLearningRate = initialEta;
-        _NN.EtaLearningRatePrevious = initialEta;
+        NN.EtaLearningRate = initialEta;
+        NN.EtaLearningRatePrevious = initialEta;
 
         //run thread here
-        _EventTrainingStopThread.Reset();
-        _EventTrainingThreadStopped.Reset();
-        _trainer_threads = new List<Thread>(2);
-        _MnistTrainingDatabase.RandomizePatternSequence();
+        EventTrainingStopThread.Reset();
+        EventTrainingThreadStopped.Reset();
+        TrainerThreads = new List<Thread>(2);
+        MnistTrainingDatabase.RandomizePatternSequence();
         //cleare mutex before run threads.
         var mutexs = new List<Mutex>(2);
         for (int i = 0; i < 4; i++)
         {
-            Mutex mutex = new Mutex();
-            mutexs.Add(mutex);
+            mutexs.Add(new());
         }
 
         //create neural network
         try
         {
-            CreateNNNetWork(_TrainingNN);
+            CreateNNNetWork(TrainingNN);
             //initialize weight parameters to the network
-            if (_mnistWeightsFile != "")
+            if (MnistWeightsFile != "")
             {
-                _MainMutex.WaitOne();
-                var fsIn = new FileStream(_mnistWeightsFile, FileMode.Open);
+                MainMutex.WaitOne();
+                var fsIn = new FileStream(MnistWeightsFile, FileMode.Open);
                 var arIn = new Archive(fsIn, ArchiveOp.Load);
-                _TrainingNN.Serialize(arIn);
+                TrainingNN.Serialize(arIn);
                 fsIn.Close();
-                _MainMutex.ReleaseMutex();
+                MainMutex.ReleaseMutex();
             }
         }
         catch (Exception ex)
@@ -308,14 +304,14 @@ public partial class Mainform : Form
             return false;
         }
         //
-        var ntraining = new NNTrainPatterns(_TrainingNN, _MnistTrainingDatabase, _Preference, _bTrainingDataReady, _EventTrainingStopThread,
-            _EventTrainingThreadStopped, this, mutexs)
+        var ntraining = new NNTrainPatterns(TrainingNN, MnistTrainingDatabase, Preference, IsTrainingDataReady, EventTrainingStopThread,
+            EventTrainingThreadStopped, this, mutexs)
         {
-            m_dMinimumEta = minimumEta,
-            m_dEtaDecay = etaDecay,
-            m_nAfterEveryNBackprops = nAfterEvery,
+            MinimumEta = minimumEta,
+            EtaDecay = etaDecay,
+            AfterEveryNBackprops = nAfterEvery,
             ShouldDistortPatterns = bDistortPatterns,
-            m_dEstimatedCurrentMSE = estimatedCurrentMSE
+            EstimatedCurrentMSE = estimatedCurrentMSE
             /* estimated number that will define whether a forward calculation's error is significant enough to warrant backpropagation*/
         };
 
@@ -323,7 +319,7 @@ public partial class Mainform : Form
         {
             var trainer_thread = new Thread(ntraining.BackpropagationThread);
             trainer_thread.Name = String.Format("Thread{0}", i + 1);
-            _trainer_threads.Add(trainer_thread);
+            TrainerThreads.Add(trainer_thread);
             trainer_thread.Start();
 
         }
@@ -353,7 +349,7 @@ public partial class Mainform : Form
         for (ii = 0; ii < 841; ii++)
         {
             sLabel = String.Format("Layer00_Neuro{0}_Num{1}", ii, icNeurons);
-            pLayer.m_Neurons.Add(new NNNeuron(sLabel));
+            pLayer.Neurons.Add(new NNNeuron(sLabel));
             icNeurons++;
         }
 
@@ -371,7 +367,7 @@ public partial class Mainform : Form
         for (ii = 0; ii < 1014; ii++)
         {
             sLabel = String.Format("Layer01_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.m_Neurons.Add(new NNNeuron(sLabel));
+            pLayer.Neurons.Add(new NNNeuron(sLabel));
             icNeurons++;
         }
 
@@ -380,7 +376,7 @@ public partial class Mainform : Form
 
             sLabel = String.Format("Layer01_Weigh{0}_Num{1}", ii, icWeights);
             initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
-            pLayer.m_Weights.Add(new NNWeight(sLabel, initWeight));
+            pLayer.Weights.Add(new NNWeight(sLabel, initWeight));
         }
 
         // interconnections with previous layer: this is difficult
@@ -407,9 +403,9 @@ public partial class Mainform : Form
                 for (jj = 0; jj < 13; jj++)
                 {
                     iNumWeight = fm * 26;  // 26 is the number of weights per feature map
-                    NNNeuron n = pLayer.m_Neurons[jj + ii * 13 + fm * 169];
+                    NNNeuron n = pLayer.Neurons[jj + ii * 13 + fm * 169];
 
-                    n.AddConnection((uint)DefaultDefinations.ULONG_MAX, (uint)iNumWeight++);  // bias weight
+                    n.AddConnection((uint)Defaults.ULONG_MAX, (uint)iNumWeight++);  // bias weight
 
                     for (kk = 0; kk < 25; kk++)
                     {
@@ -433,7 +429,7 @@ public partial class Mainform : Form
         for (ii = 0; ii < 1250; ii++)
         {
             sLabel = String.Format("Layer02_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.m_Neurons.Add(new NNNeuron(sLabel));
+            pLayer.Neurons.Add(new NNNeuron(sLabel));
             icNeurons++;
         }
 
@@ -442,7 +438,7 @@ public partial class Mainform : Form
 
             sLabel = String.Format("Layer02_Weight{0}_Num{1}", ii, icWeights);
             initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
-            pLayer.m_Weights.Add(new NNWeight(sLabel, initWeight));
+            pLayer.Weights.Add(new NNWeight(sLabel, initWeight));
         }
 
         // Interconnections with previous layer: this is difficult
@@ -469,9 +465,9 @@ public partial class Mainform : Form
                 for (jj = 0; jj < 5; jj++)
                 {
                     iNumWeight = fm * 156;  // 26 is the number of weights per feature map
-                    NNNeuron n = pLayer.m_Neurons[jj + ii * 5 + fm * 25];
+                    NNNeuron n = pLayer.Neurons[jj + ii * 5 + fm * 25];
 
-                    n.AddConnection((uint)DefaultDefinations.ULONG_MAX, (uint)iNumWeight++);  // bias weight
+                    n.AddConnection((uint)Defaults.ULONG_MAX, (uint)iNumWeight++);  // bias weight
 
                     for (kk = 0; kk < 25; kk++)
                     {
@@ -500,7 +496,7 @@ public partial class Mainform : Form
         for (ii = 0; ii < 100; ii++)
         {
             sLabel = String.Format("Layer03_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.m_Neurons.Add(new NNNeuron(sLabel));
+            pLayer.Neurons.Add(new NNNeuron(sLabel));
             icNeurons++;
         }
 
@@ -509,7 +505,7 @@ public partial class Mainform : Form
 
             sLabel = String.Format("Layer03_Weight{0}_Num{1}", ii, icWeights);
             initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
-            pLayer.m_Weights.Add(new NNWeight(sLabel, initWeight));
+            pLayer.Weights.Add(new NNWeight(sLabel, initWeight));
         }
 
         // Interconnections with previous layer: fully-connected
@@ -518,8 +514,8 @@ public partial class Mainform : Form
 
         for (fm = 0; fm < 100; fm++)
         {
-            NNNeuron n = pLayer.m_Neurons[fm];
-            n.AddConnection((uint)DefaultDefinations.ULONG_MAX, (uint)iNumWeight++);  // bias weight
+            NNNeuron n = pLayer.Neurons[fm];
+            n.AddConnection((uint)Defaults.ULONG_MAX, (uint)iNumWeight++);  // bias weight
 
             for (ii = 0; ii < 1250; ii++)
             {
@@ -541,7 +537,7 @@ public partial class Mainform : Form
         for (ii = 0; ii < 10; ii++)
         {
             sLabel = String.Format("Layer04_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.m_Neurons.Add(new NNNeuron(sLabel));
+            pLayer.Neurons.Add(new NNNeuron(sLabel));
             icNeurons++;
         }
 
@@ -550,7 +546,7 @@ public partial class Mainform : Form
 
             sLabel = String.Format("Layer04_Weight{0}_Num{1}", ii, icWeights);
             initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
-            pLayer.m_Weights.Add(new NNWeight(sLabel, initWeight));
+            pLayer.Weights.Add(new NNWeight(sLabel, initWeight));
         }
 
         // Interconnections with previous layer: fully-connected
@@ -559,8 +555,8 @@ public partial class Mainform : Form
 
         for (fm = 0; fm < 10; fm++)
         {
-            var n = pLayer.m_Neurons[fm];
-            n.AddConnection((uint)DefaultDefinations.ULONG_MAX, (uint)iNumWeight++);  // bias weight
+            var n = pLayer.Neurons[fm];
+            n.AddConnection((uint)Defaults.ULONG_MAX, (uint)iNumWeight++);  // bias weight
 
             for (ii = 0; ii < 100; ii++)
             {
@@ -578,9 +574,9 @@ public partial class Mainform : Form
     //stop threads.
     private void StopBackPropagationbutton_Click(object sender, EventArgs e)
     {
-        if (_bTrainingThreadRuning)
+        if (IsTrainingThreadRuning)
         {
-            if (StopTheads(_trainer_threads, _EventTrainingStopThread, _EventTrainingThreadStopped))
+            if (StopTheads(TrainerThreads, EventTrainingStopThread, EventTrainingThreadStopped))
             {
                 BackPropagationThreadsFinished();		// set initial state of buttons
             }
@@ -589,31 +585,29 @@ public partial class Mainform : Form
 
     void BackPropagationThreadsFinished()
     {
-        if (_bTrainingThreadRuning)
+        if (IsTrainingThreadRuning)
         {
             var msResult = MessageBox.Show("Do you want to save Neural Network data ?", "Save Neural Network Data", MessageBoxButtons.OKCancel);
             if (msResult == DialogResult.OK)
             {
-                using (var saveFileDialog1 = new System.Windows.Forms.SaveFileDialog { Filter = "Mnist Neural network file (*.nnt)|*.nnt", Title = "Save Neural network File" })
+                using var dialog = new System.Windows.Forms.SaveFileDialog { Filter = "Mnist Neural network file (*.nnt)|*.nnt", Title = "Save Neural network File" };
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                    {
 
-                        var fsIn = saveFileDialog1.OpenFile();
-                        var arIn = new Archive(fsIn, ArchiveOp.Store);
-                        _TrainingNN.Serialize(arIn);
-                        fsIn.Close();
-                    }
+                    var fsIn = dialog.OpenFile();
+                    var arIn = new Archive(fsIn, ArchiveOp.Store);
+                    TrainingNN.Serialize(arIn);
+                    fsIn.Close();
                 }
             }
-            _bTrainingThreadRuning = false;
+            IsTrainingThreadRuning = false;
         }
         return;
     }
     // Load Image from file
     private Bitmap CreateNonIndexedImage(Bitmap src)
     {
-        Bitmap newBmp = new Bitmap(src.Width, src.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        var newBmp = new Bitmap(src.Width, src.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
         using (var gfx = Graphics.FromImage(newBmp))
         {
             gfx.DrawImage(src, 0, 0);
@@ -621,55 +615,53 @@ public partial class Mainform : Form
         return newBmp;
     }
 
-    private void networkParametersToolStripMenuItem_Click(object sender, EventArgs e)
+    private void NetworkParametersToolStripMenuItem_Click(object sender, EventArgs e)
     {
-        using (var openFileDialog1 = new System.Windows.Forms.OpenFileDialog { Filter = "Mnist Neural network file (*.nnt)|*.nnt", Title = "Open Neural network File" })
+        using var dialog = new System.Windows.Forms.OpenFileDialog { Filter = "Mnist Neural network file (*.nnt)|*.nnt", Title = "Open Neural network File" };
+        if (dialog.ShowDialog() == DialogResult.OK)
         {
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                _MainMutex.WaitOne();
-                _mnistWeightsFile = openFileDialog1.FileName;
-                var fsIn = openFileDialog1.OpenFile();
-                var arIn = new Archive(fsIn, ArchiveOp.Load);
-                _NN.Serialize(arIn);
-                fsIn.Close();
-                _MainMutex.ReleaseMutex();
-            }
+            MainMutex.WaitOne();
+            MnistWeightsFile = dialog.FileName;
+            var fsIn = dialog.OpenFile();
+            var arIn = new Archive(fsIn, ArchiveOp.Load);
+            NN.Serialize(arIn);
+            fsIn.Close();
+            MainMutex.ReleaseMutex();
         }
     }
 
-    private void mNISTDatabaseToolStripMenuItem_Click(object sender, EventArgs e)
+    private void MNISTDatabaseToolStripMenuItem_Click(object sender, EventArgs e)
     {
-        _bTrainingDataReady = _MnistTrainingDatabase.LoadMinstFiles();
-        if (_bTrainingDataReady)
+        IsTrainingDataReady = MnistTrainingDatabase.LoadMinstFiles();
+        if (IsTrainingDataReady)
         {
 
             //update Preferences parametters
-            if (_MnistTrainingDatabase.m_pImagePatterns.Count != _Preference.ItemsTrainingImages)
+            if (MnistTrainingDatabase.ImagePatterns.Count != Preference.ItemsTrainingImages)
             {
-                _Preference.ItemsTrainingImages = (uint)_MnistTrainingDatabase.m_pImagePatterns.Count;
-                _Preference.ItemsTrainingLabels = (uint)_MnistTrainingDatabase.m_pImagePatterns.Count;
+                Preference.ItemsTrainingImages = (uint)MnistTrainingDatabase.ImagePatterns.Count;
+                Preference.ItemsTrainingLabels = (uint)MnistTrainingDatabase.ImagePatterns.Count;
             }
             radioButtonMnistTrainDatabase.Enabled = true;
             radioButtonTrainingdatabase.Enabled = true;
             buttonMnistNext.Enabled = true;
             buttonMnistPrevious.Enabled = true;
-            _bDatabaseReady = _bTrainingDataReady;
-            _Mnistdatabase = _MnistTrainingDatabase;
+            IsDatabaseReady = IsTrainingDataReady;
+            Mnistdatabase = MnistTrainingDatabase;
         }
         else
         {
             radioButtonMnistTrainDatabase.Enabled = false;
             return;
         }
-        _bTestingDataReady = _MinstTestingDatabase.LoadMinstFiles();
-        if (_bTestingDataReady)
+        IsTestingDataReady = MinstTestingDatabase.LoadMinstFiles();
+        if (IsTestingDataReady)
         {
             //update Preferences parametters
-            if (_MinstTestingDatabase.m_pImagePatterns.Count != _Preference.ItemsTestingImages)
+            if (MinstTestingDatabase.ImagePatterns.Count != Preference.ItemsTestingImages)
             {
-                _Preference.ItemsTestingImages = (uint)_MinstTestingDatabase.m_pImagePatterns.Count;
-                _Preference.ItemsTestingLabels = (uint)_MinstTestingDatabase.m_pImagePatterns.Count;
+                Preference.ItemsTestingImages = (uint)MinstTestingDatabase.ImagePatterns.Count;
+                Preference.ItemsTestingLabels = (uint)MinstTestingDatabase.ImagePatterns.Count;
             }
             radioButtonMnistTestDatabase.Enabled = true;
             radioButtonMnistTestDatabase.Checked = true;
@@ -677,8 +669,8 @@ public partial class Mainform : Form
             radioButtonTestingdatabase.Checked = true;
             buttonMnistNext.Enabled = true;
             buttonMnistPrevious.Enabled = true;
-            _bDatabaseReady = _bTestingDataReady;
-            _Mnistdatabase = _MinstTestingDatabase;
+            IsDatabaseReady = IsTestingDataReady;
+            Mnistdatabase = MinstTestingDatabase;
         }
         else
         {
@@ -687,9 +679,9 @@ public partial class Mainform : Form
         }
     }
 
-    private void buttonMnistTest_Click(object sender, EventArgs e)
+    private void ButtonMnistTest_Click(object sender, EventArgs e)
     {
-        if ((_bTestingThreadRuning == false) && (_bTrainingThreadRuning == false))
+        if ((IsTestingThreadRuning == false) && (IsTrainingThreadRuning == false))
         {
             var mutexs = new List<Mutex>(2);
             int theadsNum = (int)numericUpDownThreads.Value;
@@ -701,14 +693,14 @@ public partial class Mainform : Form
             {
                 CreateNNNetWork(nnNetwork);
                 //initialize weight parameters to the network
-                if (_mnistWeightsFile != "")
+                if (MnistWeightsFile != "")
                 {
-                    _MainMutex.WaitOne();
-                    var fsIn = new FileStream(_mnistWeightsFile, FileMode.Open);
+                    MainMutex.WaitOne();
+                    var fsIn = new FileStream(MnistWeightsFile, FileMode.Open);
                     var arIn = new Archive(fsIn, ArchiveOp.Load);
                     nnNetwork.Serialize(arIn);
                     fsIn.Close();
-                    _MainMutex.ReleaseMutex();
+                    MainMutex.ReleaseMutex();
                 }
             }
             catch (Exception ex)
@@ -719,10 +711,10 @@ public partial class Mainform : Form
             //
             if (radioButtonTestingdatabase.Checked)
             {
-                if (_bTestingDataReady)
+                if (IsTestingDataReady)
                 {
-                    nnTesting = new NNTestPatterns(nnNetwork, _MinstTestingDatabase, _Preference, _bTestingDataReady, _EventTestingStopThread, _EventTestingThreadStopped, this, mutexs);
-                    bDatabaseforTest = _bTestingDataReady;
+                    nnTesting = new NNTestPatterns(nnNetwork, MinstTestingDatabase, Preference, IsTestingDataReady, EventTestingStopThread, EventTestingThreadStopped, this, mutexs);
+                    bDatabaseforTest = IsTestingDataReady;
                 }
                 else
                 {
@@ -731,10 +723,10 @@ public partial class Mainform : Form
             }
             else
             {
-                if (_bTrainingDataReady)
+                if (IsTrainingDataReady)
                 {
-                    nnTesting = new NNTestPatterns(nnNetwork, _MnistTrainingDatabase, _Preference, _bTrainingDataReady, _EventTestingStopThread, _EventTestingThreadStopped, this, mutexs);
-                    bDatabaseforTest = _bTrainingDataReady;
+                    nnTesting = new NNTestPatterns(nnNetwork, MnistTrainingDatabase, Preference, IsTrainingDataReady, EventTestingStopThread, EventTestingThreadStopped, this, mutexs);
+                    bDatabaseforTest = IsTrainingDataReady;
                 }
                 else
                 {
@@ -750,9 +742,9 @@ public partial class Mainform : Form
                     var mutex = new Mutex();
                     mutexs.Add(mutex);
                 }
-                _EventTestingStopThread.Reset();
-                _EventTestingThreadStopped.Reset();
-                _testing_threads = new List<Thread>(2);
+                EventTestingStopThread.Reset();
+                EventTestingThreadStopped.Reset();
+                TestingThreads = new List<Thread>(2);
 
                 try
                 {
@@ -762,7 +754,7 @@ public partial class Mainform : Form
                                                     {
                                                         nnTesting.PatternsTestingThread((int)numericUpDownNumberofTestPattern.Value);
                                                     });
-                        _testing_threads.Add(thread);
+                        TestingThreads.Add(thread);
                         thread.Start();
                     }
                 }
@@ -771,7 +763,7 @@ public partial class Mainform : Form
                     MessageBox.Show(ex.ToString());
                     return;
                 }
-                _bTestingThreadRuning = true;
+                IsTestingThreadRuning = true;
                 radioButtonTestingdatabase.Enabled = false;
                 radioButtonTrainingdatabase.Enabled = false;
                 buttonMnistTest.Enabled = false;
@@ -827,13 +819,13 @@ public partial class Mainform : Form
 
         }
     }
-    private void buttonStopMnistTest_Click(object sender, EventArgs e)
+    private void ButtonStopMnistTest_Click(object sender, EventArgs e)
     {
-        if (_bTestingThreadRuning)
+        if (IsTestingThreadRuning)
         {
-            if (StopTheads(_testing_threads, _EventTestingStopThread, _EventTestingThreadStopped))
+            if (StopTheads(TestingThreads, EventTestingStopThread, EventTestingThreadStopped))
             {
-                _bTestingThreadRuning = false;
+                IsTestingThreadRuning = false;
                 radioButtonTestingdatabase.Enabled = true;
                 radioButtonTrainingdatabase.Enabled = true;
                 buttonMnistTest.Enabled = true;
@@ -843,13 +835,11 @@ public partial class Mainform : Form
         //grayscale bitmap
     }
 
-    private void radioButtonTestingdatabase_CheckedChanged(object sender, EventArgs e)
+    private void RadioButtonTestingdatabase_CheckedChanged(object sender, EventArgs e)
     {
         if (radioButtonTestingdatabase.Checked)
         {
             numericUpDownNumberofTestPattern.Maximum = 9999;
-
-
         }
         else
         {
@@ -862,23 +852,23 @@ public partial class Mainform : Form
     {
         if (radioButtonMnistTestDatabase.Checked)
         {
-            _Mnistdatabase = _MinstTestingDatabase;
-            _bDatabaseReady = _bTestingDataReady;
-            _icurrentMnistPattern = 0;
+            Mnistdatabase = MinstTestingDatabase;
+            IsDatabaseReady = IsTestingDataReady;
+            CurrentMnistPattern = 0;
         }
         else
         {
-            _Mnistdatabase = _MinstTestingDatabase;
-            _bDatabaseReady = _bTrainingDataReady;
-            _icurrentMnistPattern = 0;
+            Mnistdatabase = MinstTestingDatabase;
+            IsDatabaseReady = IsTrainingDataReady;
+            CurrentMnistPattern = 0;
         }
     }
 
     private void Mainform_FormClosing(object sender, FormClosingEventArgs e)
     {
-        if (_bTestingThreadRuning || _bTrainingThreadRuning)
+        if (IsTestingThreadRuning || IsTrainingThreadRuning)
         {
-            var result = MessageBox.Show("Sorry, some threads are running. Please stop them before  you can close the program", "", MessageBoxButtons.OK);
+            _ = MessageBox.Show("Sorry, some threads are running. Please stop them before  you can close the program", "", MessageBoxButtons.OK);
             e.Cancel = true;
         }
 

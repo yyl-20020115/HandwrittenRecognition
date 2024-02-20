@@ -9,13 +9,13 @@ public class NNWeight : IArchiveSerialization
     public double DiagHessian;
     public NNWeight()
     {
-        Label = "";
+        Label = string.Empty;
         Value = 0.0;
         DiagHessian = 0.0;
     }
-    public NNWeight(string str, double val = 0.0)
+    public NNWeight(string label, double val = 0.0)
     {
-        Label = str;
+        Label = label;
         Value = val;
         DiagHessian = 0.0;
     }

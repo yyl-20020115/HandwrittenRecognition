@@ -28,11 +28,11 @@ public class NeuralNetwork : IArchiveSerialization
         {
 
             int count = 0;
-            if (iCount != lit.m_Neurons.Count)
+            if (iCount != lit.Neurons.Count)
             {
                 return;
             }
-            foreach (var nit in lit.m_Neurons)
+            foreach (var nit in lit.Neurons)
             {
                 if (count < iCount)
                 {
@@ -56,7 +56,7 @@ public class NeuralNetwork : IArchiveSerialization
 
             for (int ii = 0; ii < oCount; ii++)
             {
-                outputVector[ii] = lit.m_Neurons[ii].Output;
+                outputVector[ii] = lit.Neurons[ii].Output;
             }
         }
 
@@ -69,10 +69,10 @@ public class NeuralNetwork : IArchiveSerialization
             pNeuronOutputs.Capacity = Layers.Count;
             foreach (NNLayer nnlit in Layers)
             {
-                var layerOut = new NNNeuronOutputs(nnlit.m_Neurons.Count);
-                for (int ii = 0; ii < nnlit.m_Neurons.Count; ++ii)
+                var layerOut = new NNNeuronOutputs(nnlit.Neurons.Count);
+                for (int ii = 0; ii < nnlit.Neurons.Count; ++ii)
                 {
-                    layerOut.Add(nnlit.m_Neurons[ii].Output);
+                    layerOut.Add(nnlit.Neurons[ii].Output);
                 }
                 pNeuronOutputs.Add(layerOut);
             }
@@ -120,7 +120,7 @@ public class NeuralNetwork : IArchiveSerialization
         //   Conveniently, for F = tanh, then F'(Yn) = 1 - Xn^2, i.e., the derivative can be calculated from the output, without knowledge of the input
 
         int iSize = Layers.Count;
-        var dErr_wrt_dXlast = new DErrorsList(Layers[Layers.Count - 1].m_Neurons.Count);
+        var dErr_wrt_dXlast = new DErrorsList(Layers[Layers.Count - 1].Neurons.Count);
         var differentials = new List<DErrorsList>(iSize);
 
         int ii;
@@ -129,7 +129,7 @@ public class NeuralNetwork : IArchiveSerialization
         // for the standard MSE Err function (i.e., 0.5*sumof( (actual-target)^2 ), this differential is simply
         // the difference between the target and the actual
 
-        for (ii = 0; ii < Layers[Layers.Count - 1].m_Neurons.Count; ++ii)
+        for (ii = 0; ii < Layers[Layers.Count - 1].Neurons.Count; ++ii)
         {
             dErr_wrt_dXlast.Add(actualOutput[ii] - desiredOutput[ii]);
         }
@@ -141,8 +141,8 @@ public class NeuralNetwork : IArchiveSerialization
 
         for (ii = 0; ii < iSize - 1; ii++)
         {
-            var m_differential = new DErrorsList(Layers[ii].m_Neurons.Count);
-            for (int kk = 0; kk < Layers[ii].m_Neurons.Count; kk++)
+            var m_differential = new DErrorsList(Layers[ii].Neurons.Count);
+            for (int kk = 0; kk < Layers[ii].Neurons.Count; kk++)
             {
                 m_differential.Add(0.0);
             }
@@ -212,7 +212,7 @@ public class NeuralNetwork : IArchiveSerialization
         // second derivatives"
 
         int iSize = Layers.Count;
-        int neuronCount = Layers[Layers.Count - 1].m_Neurons.Count;
+        int neuronCount = Layers[Layers.Count - 1].Neurons.Count;
         var d2Err_wrt_dXlast = new DErrorsList(neuronCount);
         var differentials = new List<DErrorsList>(iSize);
 
@@ -223,7 +223,7 @@ public class NeuralNetwork : IArchiveSerialization
 
         var lit = Layers.Last();  // point to last layer
 
-        for (int ii = 0; ii < lit.m_Neurons.Count; ii++)
+        for (int ii = 0; ii < lit.Neurons.Count; ii++)
         {
             d2Err_wrt_dXlast.Add(1.0);
         }
@@ -233,8 +233,8 @@ public class NeuralNetwork : IArchiveSerialization
 
         for (int ii = 0; ii < iSize - 1; ii++)
         {
-            var m_differential = new DErrorsList(Layers[ii].m_Neurons.Count);
-            for (int kk = 0; kk < Layers[ii].m_Neurons.Count; kk++)
+            var m_differential = new DErrorsList(Layers[ii].Neurons.Count);
+            for (int kk = 0; kk < Layers[ii].Neurons.Count; kk++)
             {
                 m_differential.Add(0.0);
             }

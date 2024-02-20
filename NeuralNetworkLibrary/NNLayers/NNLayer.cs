@@ -6,54 +6,53 @@ namespace NeuralNetworkLibrary;
 // Layer class
 public class NNLayer : IArchiveSerialization
 {
-    public NNWeightList m_Weights;
-    public NNNeuronList m_Neurons;
+    public NNWeightList Weights;
+    public NNNeuronList Neurons;
 
-    public string label;
-    public NNLayer m_pPrevLayer;
+    public string Label;
+    public NNLayer PreviousLayer;
     private SigmoidFunction m_sigmoid;
-    bool m_bFloatingPointWarning;  // flag for one-time warning (per layer) about potential floating point overflow
+    bool IsFloatingPointWarning;  // flag for one-time warning (per layer) about potential floating point overflow
     public NNLayer()
     {
-        label = "";
-        m_pPrevLayer = null;
+        Label = string.Empty;
+        PreviousLayer = null;
         m_sigmoid = new SigmoidFunction();
-        m_Weights = new NNWeightList();
-        m_Neurons = new NNNeuronList();
+        Weights = [];
+        Neurons = [];
         Initialize();
 
     }
     public NNLayer(string str, NNLayer pPrev /* =NULL */)
     {
-        label = str;
-        m_pPrevLayer = pPrev;
+        Label = str;
+        PreviousLayer = pPrev;
         m_sigmoid = new SigmoidFunction();
-        m_Weights = [];
-        m_Neurons = [];
+        Weights = [];
+        Neurons = [];
     }
     public void Initialize()
     {
-        m_Weights.Clear();
-        m_Neurons.Clear();
-        m_bFloatingPointWarning = false;
+        Weights.Clear();
+        Neurons.Clear();
+        IsFloatingPointWarning = false;
     }
     public void Calculate()
     {
-        double dSum = 0;
-        foreach (var nit in m_Neurons)
+        var dSum = 0.0;
+        foreach (var nit in Neurons)
         {
-
             foreach (var cit in nit.Connections)
             {
                 if (cit == nit.Connections[0])
                 {
-                    dSum = (m_Weights[(int)cit.WeightIndex].Value);
+                    dSum = (Weights[(int)cit.WeightIndex].Value);
                 }
                 else
                 {
 
-                    dSum += (m_Weights[(int)cit.WeightIndex].Value) *
-                        (m_pPrevLayer.m_Neurons[(int)cit.NeuronIndex].Output);
+                    dSum += (Weights[(int)cit.WeightIndex].Value) *
+                        (PreviousLayer.Neurons[(int)cit.NeuronIndex].Output);
                 }
             }
 
@@ -87,7 +86,7 @@ public class NNLayer : IArchiveSerialization
             uint kk;
             int nIndex;
             double output;
-            DErrorsList dErr_wrt_dYn = new DErrorsList(m_Neurons.Count);
+            DErrorsList dErr_wrt_dYn = new DErrorsList(Neurons.Count);
             //
             //	std::vector< double > dErr_wrt_dWn( m_Weights.size(), 0.0 );  // important to initialize to zero
             //////////////////////////////////////////////////
@@ -110,16 +109,16 @@ public class NNLayer : IArchiveSerialization
             // To avoid this requirement, I used the _alloca function, to allocate memory on the stack.
             // The downside of this is excessive stack usage, and there might be stack overflow probelms.  That's why
             // this comment is labeled "REVIEW"
-            double[] dErr_wrt_dWn = new double[m_Weights.Count];
-            for (ii = 0; ii < m_Weights.Count; ii++)
+            var dErr_wrt_dWn = new double[Weights.Count];
+            for (ii = 0; ii < Weights.Count; ii++)
             {
                 dErr_wrt_dWn[ii] = 0.0;
             }
 
-            bool bMemorized = (thisLayerOutput != null) && (prevLayerOutput != null);
+            var bMemorized = (thisLayerOutput != null) && (prevLayerOutput != null);
             // calculate dErr_wrt_dYn = F'(Yn) * dErr_wrt_Xn
 
-            for (ii = 0; ii < m_Neurons.Count; ii++)
+            for (ii = 0; ii < Neurons.Count; ii++)
             {
                 if (bMemorized != false)
                 {
@@ -127,7 +126,7 @@ public class NNLayer : IArchiveSerialization
                 }
                 else
                 {
-                    output = m_Neurons[ii].Output;
+                    output = Neurons[ii].Output;
                 }
 
                 dErr_wrt_dYn.Add(m_sigmoid.DSIGMOID(output) * dErr_wrt_dXn[ii]);
@@ -138,9 +137,9 @@ public class NNLayer : IArchiveSerialization
             // update the differential for the corresponding weight
 
             ii = 0;
-            foreach (NNNeuron nit in m_Neurons)
+            foreach (var nit in Neurons)
             {
-                foreach (NNConnection cit in nit.Connections)
+                foreach (var cit in nit.Connections)
                 {
                     kk = cit.NeuronIndex;
                     if (kk == 0xffffffff)
@@ -155,7 +154,7 @@ public class NNLayer : IArchiveSerialization
                         }
                         else
                         {
-                            output = m_pPrevLayer.m_Neurons[(int)kk].Output;
+                            output = PreviousLayer.Neurons[(int)kk].Output;
                         }
                     }
                     dErr_wrt_dWn[cit.WeightIndex] += dErr_wrt_dYn[ii] * output;
@@ -168,9 +167,9 @@ public class NNLayer : IArchiveSerialization
             // For each neuron in this layer
 
             ii = 0;
-            foreach (NNNeuron nit in m_Neurons)
+            foreach (var nit in Neurons)
             {
-                foreach (NNConnection cit in nit.Connections)
+                foreach (var cit in nit.Connections)
                 {
                     kk = cit.NeuronIndex;
                     if (kk != 0xffffffff)
@@ -179,7 +178,7 @@ public class NNLayer : IArchiveSerialization
                         // constant output of "1", since we cannot train the bias neuron
 
                         nIndex = (int)kk;
-                        dErr_wrt_dXnm1[nIndex] += dErr_wrt_dYn[ii] * m_Weights[(int)cit.WeightIndex].Value;
+                        dErr_wrt_dXnm1[nIndex] += dErr_wrt_dYn[ii] * Weights[(int)cit.WeightIndex].Value;
                     }
 
                 }
@@ -194,9 +193,9 @@ public class NNLayer : IArchiveSerialization
             double epsilon, divisor;
             double oldValue;
             double newValue;
-            for (jj = 0; jj < m_Weights.Count; ++jj)
+            for (jj = 0; jj < Weights.Count; ++jj)
             {
-                divisor = m_Weights[jj].DiagHessian + dMicron;
+                divisor = Weights[jj].DiagHessian + dMicron;
 
                 // the following code has been rendered unnecessary, since the value of the Hessian has been
                 // verified when it was created, so as to ensure that it is strictly
@@ -213,34 +212,29 @@ public class NNLayer : IArchiveSerialization
                   }
                 */
                 epsilon = etaLearningRate / divisor;
-                oldValue = m_Weights[jj].Value;
+                oldValue = Weights[jj].Value;
                 newValue = oldValue - epsilon * dErr_wrt_dWn[jj];
                 while (oldValue != Interlocked.CompareExchange(
-                       ref (m_Weights[jj].Value),
+                       ref (Weights[jj].Value),
                         (double)newValue, (double)oldValue))
                 {
                     // another thread must have modified the weight.
 
                     // Obtain its new value, adjust it, and try again
 
-                    oldValue = m_Weights[jj].Value;
+                    oldValue = Weights[jj].Value;
                     newValue = oldValue - epsilon * dErr_wrt_dWn[jj];
 
 
 
                 }
-
-
-
             }
-
         }
         catch (Exception)
         {
             return false;
         }
         return true;
-
     }
 
 
@@ -248,15 +242,12 @@ public class NNLayer : IArchiveSerialization
     {
         // called periodically by the neural net, to request a check on the "reasonableness" of the 
         // weights.  The warning message is given only once per layer
-
-
-
-        foreach (NNWeight wit in m_Weights)
+        foreach (var wit in Weights)
         {
 
-            double val = System.Math.Abs(wit.Value);
+            double val = Math.Abs(wit.Value);
 
-            if ((val > 100.0) && (m_bFloatingPointWarning == false))
+            if ((val > 100.0) && (IsFloatingPointWarning == false))
             {
                 // 100.0 is an arbitrary value, that no reasonable weight should ever exceed
                 /*
@@ -268,7 +259,7 @@ public class NNLayer : IArchiveSerialization
                 //show message box
                 //MessageBox.show( NULL, strMess, _T( "Problem With Weights" ), MB_ICONEXCLAMATION | MB_OK );
                 */
-                m_bFloatingPointWarning = true;
+                IsFloatingPointWarning = true;
             }
         }
     }
@@ -279,7 +270,7 @@ public class NNLayer : IArchiveSerialization
         // goes through all the weights associated with this layer, and sets each of their
         // diagHessian value to zero
 
-        foreach (NNWeight wit in m_Weights)
+        foreach (var wit in Weights)
         {
             wit.DiagHessian = 0.0;
         }
@@ -290,23 +281,19 @@ public class NNLayer : IArchiveSerialization
     {
         // goes through all the weights associated with this layer, and divides each of their
         // diagHessian value by the indicated divisor
-
-
-        double dTemp;
-
-        foreach (NNWeight wit in m_Weights)
+        foreach (var wit in Weights)
         {
-            dTemp = wit.DiagHessian;
+            var d = wit.DiagHessian;
 
-            if (dTemp < 0.0)
+            if (d < 0.0)
             {
                 // it should not be possible to reach here, since all calculations for the second
                 // derviative are strictly zero-positive.  However, there are some early indications 
                 // that this check is necessary anyway
-                dTemp = 0.0;
+                d = 0.0;
             }
 
-            wit.DiagHessian = dTemp / divisor;
+            wit.DiagHessian = d / divisor;
         }
     }
     public void BackpropagateSecondDerivatives(DErrorsList d2Err_wrt_dXn /* in */,
@@ -333,7 +320,7 @@ public class NNLayer : IArchiveSerialization
         double output;
         double dTemp;
 
-        var d2Err_wrt_dYn = new DErrorsList(m_Neurons.Count);
+        var d2Err_wrt_dYn = new DErrorsList(Neurons.Count);
         //
         // std::vector< double > d2Err_wrt_dWn( m_Weights.size(), 0.0 );  // important to initialize to zero
         //////////////////////////////////////////////////
@@ -361,17 +348,17 @@ public class NNLayer : IArchiveSerialization
         // The downside of this is excessive stack usage, and there might be stack overflow probelms.  That's why
         // this comment is labeled "REVIEW"
 
-        double[] d2Err_wrt_dWn = new double[m_Weights.Count];
-        for (ii = 0; ii < m_Weights.Count; ii++)
+        double[] d2Err_wrt_dWn = new double[Weights.Count];
+        for (ii = 0; ii < Weights.Count; ii++)
         {
             d2Err_wrt_dWn[ii] = 0.0;
         }
         // calculate d2Err_wrt_dYn = ( F'(Yn) )^2 * dErr_wrt_Xn (where dErr_wrt_Xn is actually a second derivative )
 
-        for (ii = 0; ii < m_Neurons.Count; ii++)
+        for (ii = 0; ii < Neurons.Count; ii++)
         {
 
-            output = m_Neurons[ii].Output;
+            output = Neurons[ii].Output;
             dTemp = m_sigmoid.DSIGMOID(output);
             d2Err_wrt_dYn.Add(d2Err_wrt_dXn[ii] * dTemp * dTemp);
         }
@@ -380,7 +367,7 @@ public class NNLayer : IArchiveSerialization
         // update the differential for the corresponding weight
 
         ii = 0;
-        foreach (NNNeuron nit in m_Neurons)
+        foreach (NNNeuron nit in Neurons)
         {
             foreach (NNConnection cit in nit.Connections)
             {
@@ -394,7 +381,7 @@ public class NNLayer : IArchiveSerialization
                     }
                     else
                     {
-                        output = m_pPrevLayer.m_Neurons[(int)kk].Output;
+                        output = PreviousLayer.Neurons[(int)kk].Output;
                     }
 
                     ////////////	ASSERT( (*cit).WeightIndex < d2Err_wrt_dWn.size() );  // since after changing d2Err_wrt_dWn to a C-style array, the size() function this won't work
@@ -415,9 +402,9 @@ public class NNLayer : IArchiveSerialization
         // For each neuron in this layer
 
         ii = 0;
-        foreach (NNNeuron nit in m_Neurons)
+        foreach (var nit in Neurons)
         {
-            foreach (NNConnection cit in nit.Connections)
+            foreach (var cit in nit.Connections)
             {
                 try
                 {
@@ -428,7 +415,7 @@ public class NNLayer : IArchiveSerialization
                         // constant output of "1", since we cannot train the bias neuron
 
                         nIndex = (int)kk;
-                        dTemp = m_Weights[(int)cit.WeightIndex].Value;
+                        dTemp = Weights[(int)cit.WeightIndex].Value;
                         d2Err_wrt_dXnm1[nIndex] += d2Err_wrt_dYn[ii] * dTemp * dTemp;
                     }
                 }
@@ -441,7 +428,6 @@ public class NNLayer : IArchiveSerialization
             ii++;  // ii tracks the neuron iterator
 
         }
-        double oldValue, newValue;
 
         // finally, update the diagonal Hessians for the weights of this layer neuron using dErr_wrt_dW.
         // By design, this function (and its iteration over many (approx 500 patterns) is called while a 
@@ -450,11 +436,11 @@ public class NNLayer : IArchiveSerialization
         // use an atomic compare-and-exchange operation, which means that another thread might be in 
         // the process of backpropagation of second derivatives and the Hessians might have shifted slightly
 
-        for (jj = 0; jj < m_Weights.Count; jj++)
+        for (jj = 0; jj < Weights.Count; jj++)
         {
-            oldValue = m_Weights[jj].DiagHessian;
-            newValue = oldValue + d2Err_wrt_dWn[jj];
-            m_Weights[jj].DiagHessian = newValue;
+            var oldValue = Weights[jj].DiagHessian;
+            var newValue = oldValue + d2Err_wrt_dWn[jj];
+            Weights[jj].DiagHessian = newValue;
         }
     }
     virtual public void Serialize(Archive ar)
@@ -466,26 +452,24 @@ public class NNLayer : IArchiveSerialization
             // TODO: add storing code here
             // TODO: add storing code here
 
-            ar.Write(label);
+            ar.Write(Label);
             //ar.WriteString(_T("\r\n"));  // ar.ReadString will look for \r\n when loading from the archive
-            ar.Write(m_Neurons.Count);
-            ar.Write(m_Weights.Count);
+            ar.Write(Neurons.Count);
+            ar.Write(Weights.Count);
 
-
-
-            foreach (NNNeuron nit in m_Neurons)
+            foreach (var nit in Neurons)
             {
                 ar.Write(nit.Label);
                 ar.Write(nit.Connections.Count);
 
-                foreach (NNConnection cit in nit.Connections)
+                foreach (var cit in nit.Connections)
                 {
                     ar.Write(cit.NeuronIndex);
                     ar.Write(cit.WeightIndex);
                 }
             }
 
-            foreach (NNWeight wit in m_Weights)
+            foreach (var wit in Weights)
             {
                 ar.Write(wit.Label);
                 ar.Write(wit.Value);
@@ -495,37 +479,33 @@ public class NNLayer : IArchiveSerialization
         {
             // TODO: add loading code here
 
-            string label;
             //Read Layter's label
-            ar.Read(out label);
-            this.label = label;
-
-            int iNumNeurons, iNumWeights, iNumConnections;
-            double value;
+            ar.Read(out string label);
+            this.Label = label;
 
             NNNeuron pNeuron;
             NNWeight pWeight;
 
             //Read No of Neuron, Weight
-            ar.Read(out iNumNeurons);
-            ar.Read(out iNumWeights);
+            ar.Read(out int iNumNeurons);
+            ar.Read(out int iNumWeights);
             if (iNumNeurons != 0)
             {
                 //clear neuron list and weight list.
-                m_Neurons.Clear();
-                m_Neurons = new NNNeuronList(iNumNeurons);
-                m_Weights.Clear();
-                m_Weights = new NNWeightList(iNumWeights);
+                Neurons.Clear();
+                Neurons = new (iNumNeurons);
+                Weights.Clear();
+                Weights = new (iNumWeights);
 
                 for (ii = 0; ii < iNumNeurons; ii++)
                 {
                     //ar.Read Neuron's label
                     ar.Read(out label);
                     //Read Neuron's Connection number
-                    ar.Read(out iNumConnections);
+                    ar.Read(out int iNumConnections);
                     pNeuron = new NNNeuron(label, iNumConnections);
                     //pNeuron.Label = str;
-                    m_Neurons.Add(pNeuron);
+                    Neurons.Add(pNeuron);
                     for (jj = 0; jj < iNumConnections; jj++)
                     {
                         var conn = new NNConnection();
@@ -538,13 +518,12 @@ public class NNLayer : IArchiveSerialization
                 for (jj = 0; jj < iNumWeights; jj++)
                 {
                     ar.Read(out label);
-                    ar.Read(out value);
+                    ar.Read(out double value);
 
                     pWeight = new NNWeight(label, value);
-                    m_Weights.Add(pWeight);
+                    Weights.Add(pWeight);
                 }
             }
-
         }
     }
 }
