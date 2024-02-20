@@ -8,51 +8,51 @@ public class NNTestPatterns : NNForwardPropagation
 {
 
     #region Parametters
-    private readonly MnistDatabase _MnistDataSet;
-    private uint _iMisNum;
-    private uint _iNextPattern;
-    readonly Mainform _form;
+    private readonly MnistDatabase MnistDataSet;
+    private uint MnistNum;
+    private uint NextPattern;
+    readonly Mainform MainForm;
     #endregion
     public NNTestPatterns(NeuralNetwork neuronNet, MnistDatabase testtingSet, Preferences preferences, bool testingDataReady,
                         ManualResetEvent eventStop,
                         ManualResetEvent eventStopped,
                         Mainform form, List<Mutex> mutexs)
     {
-        m_currentPatternIndex = 0;
-        _bDataReady = testingDataReady;
-        _NN = neuronNet;
-        _iNextPattern = 0;
-        m_EventStop = eventStop;
-        m_EventStopped = eventStopped;
-        _form = form;
-        m_HiPerfTime = new HiPerfTimer();
-        m_nImages = (uint)testtingSet.m_pImagePatterns.Count;
+        CurrentPatternIndex = 0;
+        IsDataReady = testingDataReady;
+        Network = neuronNet;
+        NextPattern = 0;
+        StopEvent = eventStop;
+        StoppedEvent = eventStopped;
+        MainForm = form;
+        Timer = new HiPerfTimer();
+        ImageCount = (uint)testtingSet.m_pImagePatterns.Count;
 
         //Initialize Gaussian Kernel
-        m_Preferences = preferences;
-        GetGaussianKernel(preferences.m_dElasticSigma);
-        _MnistDataSet = testtingSet;
-        m_Mutexs = mutexs;
+        Preferences = preferences;
+        GetGaussianKernel(preferences.ElasticSigma);
+        MnistDataSet = testtingSet;
+        Mutexs = mutexs;
     }
     public NNTestPatterns(NeuralNetwork neuronNet, Preferences preferences,
                         HandwrittenRecogniration.Mainform form, List<Mutex> mutexs)
     {
-        m_currentPatternIndex = 0;
-        _bDataReady = true;
-        _NN = neuronNet;
-        _iNextPattern = 0;
-        m_EventStop = null;
-        m_EventStopped = null;
-        _form = form;
-        m_HiPerfTime = new HiPerfTimer();
-        m_nImages = 0;
-        _iMisNum = 0;
+        CurrentPatternIndex = 0;
+        IsDataReady = true;
+        Network = neuronNet;
+        NextPattern = 0;
+        StopEvent = null;
+        StoppedEvent = null;
+        MainForm = form;
+        Timer = new ();
+        ImageCount = 0;
+        MnistNum = 0;
 
         //Initialize Gaussian Kernel
-        m_Preferences = preferences;
-        GetGaussianKernel(preferences.m_dElasticSigma);
-        _MnistDataSet = null;
-        m_Mutexs = mutexs;
+        Preferences = preferences;
+        GetGaussianKernel(preferences.ElasticSigma);
+        MnistDataSet = null;
+        Mutexs = mutexs;
     }
     public void PatternsTestingThread(int iPatternNum)
     {
@@ -82,16 +82,16 @@ public class NNTestPatterns : NNForwardPropagation
         var memorizedNeuronOutputs = new NNNeuronOutputsList();
         //prepare for training
 
-        m_HiPerfTime.Start();
+        Timer.Start();
 
-        while (_iNextPattern < iPatternNum)
+        while (NextPattern < iPatternNum)
         {
-            m_Mutexs[1].WaitOne();
+            Mutexs[1].WaitOne();
 
-            byte[] grayLevels = new byte[m_Preferences.m_nRowsImages * m_Preferences.m_nColsImages];
+            byte[] grayLevels = new byte[Preferences.RowsImages * Preferences.ColsImages];
             //iSequentialNum = m_MnistDataSet.GetCurrentPatternNumber(m_MnistDataSet.m_bFromRandomizedPatternSequence);
-            _MnistDataSet.m_pImagePatterns[(int)_iNextPattern].pPattern.CopyTo(grayLevels, 0);
-            label = _MnistDataSet.m_pImagePatterns[(int)_iNextPattern].nLabel;
+            MnistDataSet.m_pImagePatterns[(int)NextPattern].pPattern.CopyTo(grayLevels, 0);
+            label = MnistDataSet.m_pImagePatterns[(int)NextPattern].nLabel;
             if (label < 0) label = 0;
             if (label > 9) label = 9;
 
@@ -138,21 +138,21 @@ public class NNTestPatterns : NNForwardPropagation
             if (iBestIndex != label)
             {
 
-                _iMisNum++;
-                s = "Pattern No:" + _iNextPattern.ToString() + " Recognized value:" + iBestIndex.ToString() + " Actual value:" + label.ToString();
-                if (_form != null)
-                    _form.Invoke(_form._DelegateAddObject, new Object[] { 6, s });
+                MnistNum++;
+                s = "Pattern No:" + NextPattern.ToString() + " Recognized value:" + iBestIndex.ToString() + " Actual value:" + label.ToString();
+                if (MainForm != null)
+                    MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 6, s });
 
 
             }
             else
             {
-                s = _iNextPattern.ToString() + ", Mis Nums:" + _iMisNum.ToString();
-                if (_form != null)
-                    _form.Invoke(_form._DelegateAddObject, new Object[] { 7, s });
+                s = NextPattern.ToString() + ", Mis Nums:" + MnistNum.ToString();
+                if (MainForm != null)
+                    MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 7, s });
             }
             // check if thread is cancelled
-            if (m_EventStop.WaitOne(0, true))
+            if (StopEvent.WaitOne(0, true))
             {
                 // clean-up operations may be placed here
                 // ...
@@ -160,22 +160,22 @@ public class NNTestPatterns : NNForwardPropagation
                 // Make synchronous call to main form.
                 // MainForm.AddString function runs in main thread.
                 // To make asynchronous call use BeginInvoke
-                if (_form != null)
+                if (MainForm != null)
                 {
-                    _form.Invoke(_form._DelegateAddObject, new Object[] { 8, s });
+                    MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 8, s });
                 }
 
                 // inform main thread that this thread stopped
-                m_EventStopped.Set();
-                m_Mutexs[1].ReleaseMutex();
+                StoppedEvent.Set();
+                Mutexs[1].ReleaseMutex();
                 return;
             }
-            _iNextPattern++;
-            m_Mutexs[1].ReleaseMutex();
+            NextPattern++;
+            Mutexs[1].ReleaseMutex();
         }
         {
             string s = String.Format("Mnist Testing thread: {0} stoped", Thread.CurrentThread.Name);
-            _form.Invoke(_form._DelegateAddObject, new Object[] { 8, s });
+            MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 8, s });
         }
     }
     public void PatternRecognizingThread(int iPatternNo)
@@ -206,19 +206,19 @@ public class NNTestPatterns : NNForwardPropagation
 
         var memorizedNeuronOutputs = new NNNeuronOutputsList();
         //prepare for training
-        _iNextPattern = 0;
-        _iMisNum = 0;
+        NextPattern = 0;
+        MnistNum = 0;
 
 
-        m_Mutexs[1].WaitOne();
-        if (_iNextPattern == 0)
+        Mutexs[1].WaitOne();
+        if (NextPattern == 0)
         {
-            m_HiPerfTime.Start();
+            Timer.Start();
         }
-        byte[] grayLevels = new byte[m_Preferences.m_nRowsImages * m_Preferences.m_nColsImages];
-        _MnistDataSet.m_pImagePatterns[iPatternNo].pPattern.CopyTo(grayLevels, 0);
-        label = _MnistDataSet.m_pImagePatterns[iPatternNo].nLabel;
-        _iNextPattern++;
+        byte[] grayLevels = new byte[Preferences.RowsImages * Preferences.ColsImages];
+        MnistDataSet.m_pImagePatterns[iPatternNo].pPattern.CopyTo(grayLevels, 0);
+        label = MnistDataSet.m_pImagePatterns[iPatternNo].nLabel;
+        NextPattern++;
 
         if (label < 0) label = 0;
         if (label > 9) label = 9;
@@ -263,9 +263,9 @@ public class NNTestPatterns : NNForwardPropagation
         }
 
         string s = iBestIndex.ToString();
-        _form.Invoke(_form._DelegateAddObject, new Object[] { 2, s });
+        MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 2, s });
         // check if thread is cancelled
-        m_Mutexs[1].ReleaseMutex();
+        Mutexs[1].ReleaseMutex();
 
     }
     public void PatternRecognizingThread(byte[] grayLevels)
@@ -297,10 +297,10 @@ public class NNTestPatterns : NNForwardPropagation
         var memorizedNeuronOutputs = new NNNeuronOutputsList();
 
 
-        m_Mutexs[1].WaitOne();
-        if (_iNextPattern == 0)
+        Mutexs[1].WaitOne();
+        if (NextPattern == 0)
         {
-            m_HiPerfTime.Start();
+            Timer.Start();
         }
         if (label < 0) label = 0;
         if (label > 9) label = 9;
@@ -345,10 +345,10 @@ public class NNTestPatterns : NNForwardPropagation
         }
 
         string s = iBestIndex.ToString();
-        _form.Invoke(_form._DelegateAddObject, new Object[] { 1, s });
+        MainForm.Invoke(MainForm._DelegateAddObject, new Object[] { 1, s });
         // check if thread is cancelled
 
-        m_Mutexs[1].ReleaseMutex();
+        Mutexs[1].ReleaseMutex();
 
     }
 }

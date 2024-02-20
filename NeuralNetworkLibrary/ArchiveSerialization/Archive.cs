@@ -15,180 +15,133 @@ public class Archive
     protected BinaryWriter writer = null;
     protected BinaryReader reader = null;
     protected ArchiveOp op = ArchiveOp.Load;
-    private const int m_Index = 0; // actually never changes
+    private const int Index = 0; // actually never changes
 
     public Archive(Stream _stream, ArchiveOp _op)
     {
-        op = _op;
-
-        if (_op == ArchiveOp.Load)
+        switch (op = _op)
         {
-            reader = new BinaryReader(_stream);
-        }
-        else
-        {
-            writer = new BinaryWriter(_stream);
+            case ArchiveOp.Load:
+                reader = new BinaryReader(_stream);
+                break;
+            default:
+                writer = new BinaryWriter(_stream);
+                break;
         }
     }
 
-    public bool IsStoring()
-    {
-        if (op == ArchiveOp.Store) return true;
-        return false;
-    }
+    public bool IsStoring => op == ArchiveOp.Store;
 
-    public void Serialize(IArchiveSerialization obj)
+    public void Serialize(IArchiveSerialization s)
     {
-        obj.Serialize(this);
+        s.Serialize(this);
     }
 
     //////////////////////////////////////////////////////
     // write functions
 
-    public void Write(Char ch)
-    {
+    public void Write(char ch) =>
         //writer.Write(ch);
-        writer.Write(Convert.ToInt16(ch));
-    }
+        writer.Write((short)ch);
 
-    public void Write(UInt16 n)
-    {
-        writer.Write(n);
-    }
+    public void Write(ushort n) => writer.Write(n);
 
-    public void Write(Int16 n)
-    {
-        writer.Write(n);
-    }
+    public void Write(short n) => writer.Write(n);
 
-    public void Write(UInt32 n)
-    {
-        writer.Write(n);
-    }
+    public void Write(uint n) => writer.Write(n);
 
-    public void Write(Int32 n)
-    {
-        writer.Write(n);
-    }
+    public void Write(int n) => writer.Write(n);
 
-    public void Write(UInt64 n)
-    {
-        writer.Write(n);
-    }
+    public void Write(ulong n)
+    => writer.Write(n);
 
-    public void Write(Int64 n)
-    {
-        writer.Write(n);
-    }
+    public void Write(long n) => writer.Write(n);
 
-    public void Write(Single d)
-    {
-        writer.Write(d);
-    }
+    public void Write(float d) => writer.Write(d);
 
-    public void Write(Double d)
-    {
-        writer.Write(d);
-    }
+    public void Write(double d)
+    => writer.Write(d);
 
-    public void Write(Decimal d)
-    {
+    public void Write(decimal d) =>
         // store decimals as Int64
-        Int64 n = Decimal.ToOACurrency(d);
-        writer.Write(n);
-    }
+        writer.Write(decimal.ToOACurrency(d));
 
-    public void Write(DateTime dt)
-    {
-        writer.Write(dt.ToBinary());
-    }
+    public void Write(DateTime dt) => writer.Write(dt.ToBinary());
 
-    public void Write(Boolean b)
-    {
-        writer.Write(b);
-    }
+    public void Write(bool b) => writer.Write(b);
 
     public void Write(string s)
     {
-        writer.Write(Convert.ToInt32(s.Length));
+        writer.Write(s.Length);
         writer.Write(s.ToCharArray());
     }
 
-    public void Write(Guid guid)
-    {
-        byte[] bytes = guid.ToByteArray();
-        Write(bytes);
-    }
+    public void Write(Guid guid) => Write(guid.ToByteArray());
 
-    public void Write(Byte[] buffer)
-    {
-        writer.Write(buffer);
-    }
+    public void Write(byte[] buffer) => writer.Write(buffer);
 
     ///////////////////////////////////////////////////
     // Read functions
 
     public void Read(out string s)
     {
-        Int32 length = 0;
-        Read(out length);
+        Read(out int length);
 
-        char[] ch = new char[length];
+        var chars = new char[length];
 
-        reader.Read(ch, m_Index, length);
+        reader.Read(chars, Index, length);
 
-        StringBuilder sb = new StringBuilder();
-        sb.Append(ch);
-        s = sb.ToString();
+        var builder = new StringBuilder();
+        builder.Append(chars);
+        s = builder.ToString();
     }
 
     public void Read(out UInt16 n)
     {
-        byte[] bytes = new byte[2];
-        reader.Read(bytes, m_Index, 2);
+        var bytes = new byte[2];
+        reader.Read(bytes, Index, 2);
         n = BitConverter.ToUInt16(bytes, 0);
     }
 
-    public void Read(out Int16 n)
+    public void Read(out short n)
     {
-        byte[] bytes = new byte[2];
-        reader.Read(bytes, m_Index, 2);
+        var bytes = new byte[2];
+        reader.Read(bytes, Index, 2);
         n = BitConverter.ToInt16(bytes, 0);
     }
 
-    public void Read(out UInt32 n)
+    public void Read(out uint n)
     {
-        byte[] bytes = new byte[4];
-        reader.Read(bytes, m_Index, 4);
+        var bytes = new byte[4];
+        reader.Read(bytes, Index, 4);
         n = BitConverter.ToUInt32(bytes, 0);
     }
 
-    public void Read(out Int32 n)
+    public void Read(out int n)
     {
-        byte[] bytes = new byte[4];
-        reader.Read(bytes, m_Index, 4);
+        var bytes = new byte[4];
+        reader.Read(bytes, Index, 4);
         n = BitConverter.ToInt32(bytes, 0);
     }
 
-    public void Read(out UInt64 n)
+    public void Read(out ulong n)
     {
-        byte[] bytes = new byte[8];
-        reader.Read(bytes, m_Index, 8);
+        var bytes = new byte[8];
+        reader.Read(bytes, Index, 8);
         n = BitConverter.ToUInt64(bytes, 0);
     }
 
-    public void Read(out Int64 n)
+    public void Read(out long n)
     {
-        byte[] bytes = new byte[8];
-        reader.Read(bytes, m_Index, 8);
+        var bytes = new byte[8];
+        reader.Read(bytes, Index, 8);
         n = BitConverter.ToInt64(bytes, 0);
     }
 
-    public void Read(out Char ch)
+    public void Read(out char ch)
     {
-        Int16 n;
-        Read(out n);
-        ch = Convert.ToChar(n);
+        Read(out short n);
+        ch = (char)n;
 
         /* direct reading as char doesn't work for some reason
 			Sometimes it works, but sometimes the character
@@ -204,45 +157,44 @@ public class Archive
 
     public void Read(out float d)
     {
-        byte[] bytes = new byte[4];
-        reader.Read(bytes, m_Index, 4);
+        var bytes = new byte[4];
+        reader.Read(bytes, Index, 4);
         d = BitConverter.ToSingle(bytes, 0);
     }
 
     public void Read(out double d)
     {
-        byte[] bytes = new byte[8];
-        reader.Read(bytes, m_Index, 8);
+        var bytes = new byte[8];
+        reader.Read(bytes, Index, 8);
         d = BitConverter.ToDouble(bytes, 0);
     }
 
-    public void Read(out Decimal d)
+    public void Read(out decimal d)
     {
-        byte[] bytes = new byte[8];
-        reader.Read(bytes, m_Index, 8);
+        var bytes = new byte[8];
+        reader.Read(bytes, Index, 8);
 
         // BitConverter does not support direct conversion to Decimal so use Int64
         Int64 n = BitConverter.ToInt64(bytes, 0);
-        d = Decimal.FromOACurrency(n);
+        d = decimal.FromOACurrency(n);
     }
 
     public void Read(out DateTime dt)
     {
-        Int64 l;
-        Read(out l);
+        Read(out long l);
         dt = DateTime.FromBinary(l);
     }
 
     public void Read(out Boolean b)
     {
         byte[] bytes = new byte[1];
-        reader.Read(bytes, m_Index, 1);
+        reader.Read(bytes, Index, 1);
         b = BitConverter.ToBoolean(bytes, 0);
     }
 
     public void Read(out Guid guid)
     {
-        byte[] bytes = new byte[16];
+        var bytes = new byte[16];
         Read(out bytes, 16);
         guid = new Guid(bytes);
     }
@@ -250,7 +202,7 @@ public class Archive
     public void Read(out byte[] buffer, int bufferSize)
     {
         buffer = new byte[bufferSize];
-        reader.Read(buffer, m_Index, bufferSize);
+        reader.Read(buffer, Index, bufferSize);
     }
 } // end of class
   // end of namespace

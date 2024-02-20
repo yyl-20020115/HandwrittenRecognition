@@ -5,67 +5,67 @@ namespace HandwrittenRecogniration;
 
 public struct BackPropagationParameters
 {
-    public uint m_AfterEvery;
-    public double m_EtaDecay;
-    public double m_InitialEta;
-    public double m_MinimumEta;
-    public string m_strInitialEtaMessage;
-    public string m_strStartingPatternNum;
-    public uint m_StartingPattern;
-    public uint m_cNumThreads;
-    public bool m_bDistortPatterns;
-    public double m_EstimatedCurrentMSE;
+    public uint AfterEvery;
+    public double EtaDecay;
+    public double InitialEta;
+    public double MinimumEta;
+    public string InitialEtaMessage;
+    public string StartingPatternNum;
+    public uint StartingPattern;
+    public uint NumThreads;
+    public bool UseDistortPatterns;
+    public double EstimatedCurrentMSE;
 }
 
 public partial class BackPropagationParametersForm : Form
 {
 
-    private BackPropagationParameters m_Parameters;
+    private BackPropagationParameters Parameters;
     /// <summary>
     /// 
     /// </summary>
     /// <param name="value"></param>
     public void SetBackProParameters(BackPropagationParameters value)
     {
-        m_Parameters = value;
-        textBoxAfterEveryNBackPropagations.Text = m_Parameters.m_AfterEvery.ToString();
-        textBoxBackThreads.Text = m_Parameters.m_cNumThreads.ToString();
-        textBoxEstimateofCurrentMSE.Text = m_Parameters.m_EstimatedCurrentMSE.ToString();
-        textBoxILearningRateEta.Text = m_Parameters.m_InitialEta.ToString();
-        textBoxLearningRateDecayRate.Text = m_Parameters.m_EtaDecay.ToString();
-        textBoxMinimumLearningRate.Text = m_Parameters.m_MinimumEta.ToString();
-        textBoxStartingPatternNumber.Text = m_Parameters.m_StartingPattern.ToString();
-        checkBoxDistortPatterns.Checked = m_Parameters.m_bDistortPatterns;
+        Parameters = value;
+        textBoxAfterEveryNBackPropagations.Text = Parameters.AfterEvery.ToString();
+        textBoxBackThreads.Text = Parameters.NumThreads.ToString();
+        textBoxEstimateofCurrentMSE.Text = Parameters.EstimatedCurrentMSE.ToString();
+        textBoxILearningRateEta.Text = Parameters.InitialEta.ToString();
+        textBoxLearningRateDecayRate.Text = Parameters.EtaDecay.ToString();
+        textBoxMinimumLearningRate.Text = Parameters.MinimumEta.ToString();
+        textBoxStartingPatternNumber.Text = Parameters.StartingPattern.ToString();
+        checkBoxDistortPatterns.Checked = Parameters.UseDistortPatterns;
     }
     public BackPropagationParameters GetBackProParameters()
     {
-        return m_Parameters;
+        return Parameters;
     }
     public BackPropagationParametersForm()
     {
         InitializeComponent();
-        m_Parameters.m_AfterEvery = 0;
-        m_Parameters.m_bDistortPatterns = true;
-        m_Parameters.m_cNumThreads = 0;
-        m_Parameters.m_EstimatedCurrentMSE = 0;
-        m_Parameters.m_EtaDecay = 0;
-        m_Parameters.m_InitialEta = 0;
-        m_Parameters.m_MinimumEta = 0;
-        m_Parameters.m_StartingPattern = 0;
-        m_Parameters.m_strInitialEtaMessage = "";
-        m_Parameters.m_strStartingPatternNum = "";
+        Parameters.AfterEvery = 0;
+        Parameters.UseDistortPatterns = true;
+        Parameters.NumThreads = 0;
+        Parameters.EstimatedCurrentMSE = 0;
+        Parameters.EtaDecay = 0;
+        Parameters.InitialEta = 0;
+        Parameters.MinimumEta = 0;
+        Parameters.StartingPattern = 0;
+        Parameters.InitialEtaMessage = "";
+        Parameters.StartingPatternNum = "";
     }
 
 
     private void Button1_Click(object sender, EventArgs e)
     {
-        m_Parameters.m_AfterEvery = Convert.ToUInt32(textBoxAfterEveryNBackPropagations.Text);
-        m_Parameters.m_cNumThreads = Convert.ToUInt32(textBoxBackThreads.Text);
-        m_Parameters.m_EstimatedCurrentMSE = Convert.ToDouble(textBoxEstimateofCurrentMSE.Text);
-        m_Parameters.m_InitialEta = Convert.ToDouble(textBoxILearningRateEta.Text);
-        m_Parameters.m_EtaDecay = Convert.ToDouble(textBoxLearningRateDecayRate.Text);
-        m_Parameters.m_MinimumEta = Convert.ToDouble(textBoxMinimumLearningRate.Text);
-        m_Parameters.m_StartingPattern = Convert.ToUInt32(textBoxStartingPatternNumber.Text);
-        m_Parameters.m_bDistortPatterns = checkBoxDistortPatterns.Checked;
+        uint.TryParse(textBoxAfterEveryNBackPropagations.Text,out Parameters.AfterEvery);
+        uint.TryParse(textBoxBackThreads.Text,out Parameters.NumThreads);
+        double.TryParse(textBoxEstimateofCurrentMSE.Text,out Parameters.EstimatedCurrentMSE);
+        double.TryParse(textBoxILearningRateEta.Text, out Parameters.InitialEta);
+        double.TryParse(textBoxLearningRateDecayRate.Text, out Parameters.EtaDecay);
+        double.TryParse(textBoxMinimumLearningRate.Text, out Parameters.MinimumEta);
+        uint.TryParse(textBoxStartingPatternNumber.Text, out Parameters.StartingPattern);
+        Parameters.UseDistortPatterns = checkBoxDistortPatterns.Checked;
     }
 }

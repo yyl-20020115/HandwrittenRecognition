@@ -8,71 +8,62 @@ public static class MFCStringReader
 {
     public static string ReadCString(BinaryReader reader)
     {
-        string str = "";
-        int nConvert = 1; // if we get ANSI, convert
+        var text = "";
+        var convert = 1; // if we get ANSI, convert
 
-        UInt32 nNewLen = ReadStringLength(reader);
-        if (nNewLen == unchecked((UInt32)(-1)))
+        var length = ReadStringLength(reader);
+        if (length == unchecked((uint)(-1)))
         {
-            nConvert = 1 - nConvert;
-            nNewLen = ReadStringLength(reader);
-            if (nNewLen == unchecked((UInt32)(-1)))
-                return str;
+            convert = 1 - convert;
+            length = ReadStringLength(reader);
+            if (length == unchecked((uint)(-1)))
+                return text;
         }
 
         // set length of string to new length
-        UInt32 nByteLen = nNewLen;
-        nByteLen += (UInt32)(nByteLen * (1 - nConvert)); // bytes to read
+        var bytes = length;
+        bytes += (uint)(bytes * (1 - convert)); // bytes to read
 
         // read in the characters
-        if (nNewLen != 0)
+        if (length != 0)
         {
             // read new data
-            byte[] byteBuf = reader.ReadBytes((int)nByteLen);
+            var buffer = reader.ReadBytes((int)bytes);
 
             // convert the data if as necessary
-            StringBuilder sb = new StringBuilder();
-            if (nConvert != 0)
+            var builder = new StringBuilder();
+            if (convert != 0)
             {
-                for (int i = 0; i < nNewLen; i++)
-                    sb.Append((char)byteBuf[i]);
+                for (int i = 0; i < length; i++)
+                    builder.Append((char)buffer[i]);
             }
             else
             {
-                for (int i = 0; i < nNewLen; i++)
-                    sb.Append((char)(byteBuf[i * 2] + byteBuf[i * 2 + 1] * 256));
+                for (int i = 0; i < length; i++)
+                    builder.Append((char)(buffer[i * 2] + buffer[i * 2 + 1] * 256));
             }
 
-            str = sb.ToString();
+            text = builder.ToString();
         }
 
-        return str;
+        return text;
     }
 
-    private static UInt32 ReadStringLength(BinaryReader reader)
+    private static uint ReadStringLength(BinaryReader reader)
     {
-        UInt32 nNewLen;
-
         // attempt BYTE length first
-        byte bLen = reader.ReadByte();
+        var length = reader.ReadByte();
 
-        if (bLen < 0xff)
-            return bLen;
+        if (length < 0xff)
+            return length;
 
         // attempt WORD length
-        UInt16 wLen = reader.ReadUInt16();
-        if (wLen == 0xfffe)
+        ushort length2 = reader.ReadUInt16();
+        return length2 switch
         {
-            // UNICODE string prefix (length will follow)
-            return unchecked((UInt32)(-1));
-        }
-        else if (wLen == 0xffff)
-        {
-            // read DWORD of length
-            nNewLen = reader.ReadUInt32();
-            return nNewLen;
-        }
-        else
-            return wLen;
+            0xfffe => unchecked((uint)-1),// UNICODE string prefix (length will follow)
+            0xffff => reader.ReadUInt32(),// read DWORD of length
+            _ => length2,
+        };
     }
 }

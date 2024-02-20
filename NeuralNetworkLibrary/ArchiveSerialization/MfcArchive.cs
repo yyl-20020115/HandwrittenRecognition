@@ -34,11 +34,9 @@ public class MfcArchive : Archive
     new public void Read(out Decimal d)
     {
         // MFC stores decimal as 32-bit status value, 32-bit high value, and 32-bit low value
-        Int32 status, high;
-        UInt32 low;
-        base.Read(out status);
-        base.Read(out high);
-        base.Read(out low);
+        Read(out int status);
+        Read(out int high);
+        Read(out uint low);
 
         if (status != (int)OleCurrencyStatus.Valid)
         {

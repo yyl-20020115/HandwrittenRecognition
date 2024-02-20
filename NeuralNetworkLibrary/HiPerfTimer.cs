@@ -14,10 +14,9 @@ public class HiPerfTimer
         out long lpFrequency);
 
     private long startTime, stopTime;
-    private long freq;
+    private readonly long freq;
 
-    private bool _bStarted;
-    public bool BStarted => _bStarted;
+    public bool BStarted { get; private set; }
 
     public bool BStoped { get; private set; }
     // Constructor
@@ -26,7 +25,7 @@ public class HiPerfTimer
     {
         startTime = 0;
         stopTime = 0;
-        _bStarted = false;
+        BStarted = false;
         BStoped = true;
 
         if (QueryPerformanceFrequency(out freq) == false)
@@ -45,7 +44,7 @@ public class HiPerfTimer
 
         Thread.Sleep(0);
         QueryPerformanceCounter(out startTime);
-        _bStarted = true;
+        BStarted = true;
         BStoped = false;
     }
 
@@ -54,10 +53,14 @@ public class HiPerfTimer
     public void Stop()
     {
         QueryPerformanceCounter(out stopTime);
-        _bStarted = false;
+        BStarted = false;
         BStoped = true;
     }
 
+    public override bool Equals(object obj) 
+        => obj is HiPerfTimer timer &&
+               freq == timer.freq;
+    public override int GetHashCode() => freq.GetHashCode();
     // Returns the duration of the timer (in seconds)
 
     public double Duration => (stopTime - startTime) / (double)freq;

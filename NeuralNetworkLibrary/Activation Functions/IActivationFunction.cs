@@ -12,6 +12,4 @@ public interface IActivationFunction
     ///
     /// <remarks>The method calculates function value at point <b>x</b>.</remarks>
     ///
-
-
 }

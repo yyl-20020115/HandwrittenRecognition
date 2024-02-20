@@ -42,8 +42,8 @@ public class MnistDatabase
     protected bool _bLabelFileOpen;
     protected bool _bDatabase;
     protected bool _bFromRandomizedPatternSequence;
-    protected System.IO.BinaryReader load_ImageFile_stream;
-    protected System.IO.BinaryReader load_LabelFile_stream;
+    protected BinaryReader load_ImageFile_stream;
+    protected BinaryReader load_LabelFile_stream;
 
     public List<ImagePattern> m_pImagePatterns;
     public bool BFromRandomizedPatternSequence => _bFromRandomizedPatternSequence;
@@ -345,7 +345,7 @@ public class MnistDatabase
                 {
                     for (int ii = 0; ii < cCount; ++ii)
                     {
-                        pArray[ii] = Convert.ToByte(255 - Convert.ToInt32(pArray[ii]));
+                        pArray[ii] = (byte)(255 - pArray[ii]);
                     }
                 }
             }
@@ -356,7 +356,7 @@ public class MnistDatabase
             {
                 for (int ii = 0; ii < cCount; ++ii)
                 {
-                    pArray[ii] = Convert.ToByte(ii * 255 / cCount);
+                    pArray[ii] = (byte)(ii * 255 / cCount);
                 }
             }
         }

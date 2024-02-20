@@ -43,21 +43,21 @@ public class NNLayer : IArchiveSerialization
         foreach (var nit in m_Neurons)
         {
 
-            foreach (var cit in nit.m_Connections)
+            foreach (var cit in nit.Connections)
             {
-                if (cit == nit.m_Connections[0])
+                if (cit == nit.Connections[0])
                 {
-                    dSum = (m_Weights[(int)cit.WeightIndex].value);
+                    dSum = (m_Weights[(int)cit.WeightIndex].Value);
                 }
                 else
                 {
 
-                    dSum += (m_Weights[(int)cit.WeightIndex].value) *
-                        (m_pPrevLayer.m_Neurons[(int)cit.NeuronIndex].output);
+                    dSum += (m_Weights[(int)cit.WeightIndex].Value) *
+                        (m_pPrevLayer.m_Neurons[(int)cit.NeuronIndex].Output);
                 }
             }
 
-            nit.output = m_sigmoid.SIGMOID(dSum);
+            nit.Output = m_sigmoid.SIGMOID(dSum);
 
 
         }
@@ -127,7 +127,7 @@ public class NNLayer : IArchiveSerialization
                 }
                 else
                 {
-                    output = m_Neurons[ii].output;
+                    output = m_Neurons[ii].Output;
                 }
 
                 dErr_wrt_dYn.Add(m_sigmoid.DSIGMOID(output) * dErr_wrt_dXn[ii]);
@@ -140,7 +140,7 @@ public class NNLayer : IArchiveSerialization
             ii = 0;
             foreach (NNNeuron nit in m_Neurons)
             {
-                foreach (NNConnection cit in nit.m_Connections)
+                foreach (NNConnection cit in nit.Connections)
                 {
                     kk = cit.NeuronIndex;
                     if (kk == 0xffffffff)
@@ -155,7 +155,7 @@ public class NNLayer : IArchiveSerialization
                         }
                         else
                         {
-                            output = m_pPrevLayer.m_Neurons[(int)kk].output;
+                            output = m_pPrevLayer.m_Neurons[(int)kk].Output;
                         }
                     }
                     dErr_wrt_dWn[cit.WeightIndex] += dErr_wrt_dYn[ii] * output;
@@ -170,7 +170,7 @@ public class NNLayer : IArchiveSerialization
             ii = 0;
             foreach (NNNeuron nit in m_Neurons)
             {
-                foreach (NNConnection cit in nit.m_Connections)
+                foreach (NNConnection cit in nit.Connections)
                 {
                     kk = cit.NeuronIndex;
                     if (kk != 0xffffffff)
@@ -179,7 +179,7 @@ public class NNLayer : IArchiveSerialization
                         // constant output of "1", since we cannot train the bias neuron
 
                         nIndex = (int)kk;
-                        dErr_wrt_dXnm1[nIndex] += dErr_wrt_dYn[ii] * m_Weights[(int)cit.WeightIndex].value;
+                        dErr_wrt_dXnm1[nIndex] += dErr_wrt_dYn[ii] * m_Weights[(int)cit.WeightIndex].Value;
                     }
 
                 }
@@ -196,7 +196,7 @@ public class NNLayer : IArchiveSerialization
             double newValue;
             for (jj = 0; jj < m_Weights.Count; ++jj)
             {
-                divisor = m_Weights[jj].diagHessian + dMicron;
+                divisor = m_Weights[jj].DiagHessian + dMicron;
 
                 // the following code has been rendered unnecessary, since the value of the Hessian has been
                 // verified when it was created, so as to ensure that it is strictly
@@ -213,17 +213,17 @@ public class NNLayer : IArchiveSerialization
                   }
                 */
                 epsilon = etaLearningRate / divisor;
-                oldValue = m_Weights[jj].value;
+                oldValue = m_Weights[jj].Value;
                 newValue = oldValue - epsilon * dErr_wrt_dWn[jj];
                 while (oldValue != Interlocked.CompareExchange(
-                       ref (m_Weights[jj].value),
+                       ref (m_Weights[jj].Value),
                         (double)newValue, (double)oldValue))
                 {
                     // another thread must have modified the weight.
 
                     // Obtain its new value, adjust it, and try again
 
-                    oldValue = m_Weights[jj].value;
+                    oldValue = m_Weights[jj].Value;
                     newValue = oldValue - epsilon * dErr_wrt_dWn[jj];
 
 
@@ -254,7 +254,7 @@ public class NNLayer : IArchiveSerialization
         foreach (NNWeight wit in m_Weights)
         {
 
-            double val = System.Math.Abs(wit.value);
+            double val = System.Math.Abs(wit.Value);
 
             if ((val > 100.0) && (m_bFloatingPointWarning == false))
             {
@@ -281,7 +281,7 @@ public class NNLayer : IArchiveSerialization
 
         foreach (NNWeight wit in m_Weights)
         {
-            wit.diagHessian = 0.0;
+            wit.DiagHessian = 0.0;
         }
 
     }
@@ -296,7 +296,7 @@ public class NNLayer : IArchiveSerialization
 
         foreach (NNWeight wit in m_Weights)
         {
-            dTemp = wit.diagHessian;
+            dTemp = wit.DiagHessian;
 
             if (dTemp < 0.0)
             {
@@ -306,7 +306,7 @@ public class NNLayer : IArchiveSerialization
                 dTemp = 0.0;
             }
 
-            wit.diagHessian = dTemp / divisor;
+            wit.DiagHessian = dTemp / divisor;
         }
     }
     public void BackpropagateSecondDerivatives(DErrorsList d2Err_wrt_dXn /* in */,
@@ -371,7 +371,7 @@ public class NNLayer : IArchiveSerialization
         for (ii = 0; ii < m_Neurons.Count; ii++)
         {
 
-            output = m_Neurons[ii].output;
+            output = m_Neurons[ii].Output;
             dTemp = m_sigmoid.DSIGMOID(output);
             d2Err_wrt_dYn.Add(d2Err_wrt_dXn[ii] * dTemp * dTemp);
         }
@@ -382,7 +382,7 @@ public class NNLayer : IArchiveSerialization
         ii = 0;
         foreach (NNNeuron nit in m_Neurons)
         {
-            foreach (NNConnection cit in nit.m_Connections)
+            foreach (NNConnection cit in nit.Connections)
             {
                 try
                 {
@@ -394,7 +394,7 @@ public class NNLayer : IArchiveSerialization
                     }
                     else
                     {
-                        output = m_pPrevLayer.m_Neurons[(int)kk].output;
+                        output = m_pPrevLayer.m_Neurons[(int)kk].Output;
                     }
 
                     ////////////	ASSERT( (*cit).WeightIndex < d2Err_wrt_dWn.size() );  // since after changing d2Err_wrt_dWn to a C-style array, the size() function this won't work
@@ -417,7 +417,7 @@ public class NNLayer : IArchiveSerialization
         ii = 0;
         foreach (NNNeuron nit in m_Neurons)
         {
-            foreach (NNConnection cit in nit.m_Connections)
+            foreach (NNConnection cit in nit.Connections)
             {
                 try
                 {
@@ -428,7 +428,7 @@ public class NNLayer : IArchiveSerialization
                         // constant output of "1", since we cannot train the bias neuron
 
                         nIndex = (int)kk;
-                        dTemp = m_Weights[(int)cit.WeightIndex].value;
+                        dTemp = m_Weights[(int)cit.WeightIndex].Value;
                         d2Err_wrt_dXnm1[nIndex] += d2Err_wrt_dYn[ii] * dTemp * dTemp;
                     }
                 }
@@ -452,16 +452,16 @@ public class NNLayer : IArchiveSerialization
 
         for (jj = 0; jj < m_Weights.Count; jj++)
         {
-            oldValue = m_Weights[jj].diagHessian;
+            oldValue = m_Weights[jj].DiagHessian;
             newValue = oldValue + d2Err_wrt_dWn[jj];
-            m_Weights[jj].diagHessian = newValue;
+            m_Weights[jj].DiagHessian = newValue;
         }
     }
     virtual public void Serialize(Archive ar)
     {
         int ii, jj;
 
-        if (ar.IsStoring())
+        if (ar.IsStoring)
         {
             // TODO: add storing code here
             // TODO: add storing code here
@@ -475,10 +475,10 @@ public class NNLayer : IArchiveSerialization
 
             foreach (NNNeuron nit in m_Neurons)
             {
-                ar.Write(nit.label);
-                ar.Write(nit.m_Connections.Count);
+                ar.Write(nit.Label);
+                ar.Write(nit.Connections.Count);
 
-                foreach (NNConnection cit in nit.m_Connections)
+                foreach (NNConnection cit in nit.Connections)
                 {
                     ar.Write(cit.NeuronIndex);
                     ar.Write(cit.WeightIndex);
@@ -487,18 +487,18 @@ public class NNLayer : IArchiveSerialization
 
             foreach (NNWeight wit in m_Weights)
             {
-                ar.Write(wit.label);
-                ar.Write(wit.value);
+                ar.Write(wit.Label);
+                ar.Write(wit.Value);
             }
         }
         else
         {
             // TODO: add loading code here
 
-            string str;
+            string label;
             //Read Layter's label
-            ar.Read(out str);
-            label = str;
+            ar.Read(out label);
+            this.label = label;
 
             int iNumNeurons, iNumWeights, iNumConnections;
             double value;
@@ -520,11 +520,11 @@ public class NNLayer : IArchiveSerialization
                 for (ii = 0; ii < iNumNeurons; ii++)
                 {
                     //ar.Read Neuron's label
-                    ar.Read(out str);
+                    ar.Read(out label);
                     //Read Neuron's Connection number
                     ar.Read(out iNumConnections);
-                    pNeuron = new NNNeuron(str, iNumConnections);
-                    pNeuron.label = str;
+                    pNeuron = new NNNeuron(label, iNumConnections);
+                    //pNeuron.Label = str;
                     m_Neurons.Add(pNeuron);
                     for (jj = 0; jj < iNumConnections; jj++)
                     {
@@ -537,10 +537,10 @@ public class NNLayer : IArchiveSerialization
 
                 for (jj = 0; jj < iNumWeights; jj++)
                 {
-                    ar.Read(out str);
+                    ar.Read(out label);
                     ar.Read(out value);
 
-                    pWeight = new NNWeight(str, value);
+                    pWeight = new NNWeight(label, value);
                     m_Weights.Add(pWeight);
                 }
             }

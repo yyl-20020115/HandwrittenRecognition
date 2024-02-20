@@ -4,39 +4,39 @@ namespace NeuralNetworkLibrary;
 // Neuron class
 public class NNNeuron : IArchiveSerialization
 {
-    public string label;
-    public double output;
-    public NNConnectionList m_Connections;
+    public readonly string Label;
+    public double Output;
+    public readonly NNConnectionList Connections;
     public NNNeuron()
     {
         Initialize();
-        label = "";
-        output = 0.0;
-        m_Connections = [];
+        Label = "";
+        Output = 0.0;
+        Connections = [];
     }
     public NNNeuron(string str)
     {
-        label = str;
-        output = 0.0;
-        m_Connections = [];
+        Label = str;
+        Output = 0.0;
+        Connections = [];
         Initialize();
     }
     public NNNeuron(string str,int icount)
     {
-        label = str;
-        output = 0.0;
-        m_Connections = new NNConnectionList(icount);
+        Label = str;
+        Output = 0.0;
+        Connections = new NNConnectionList(icount);
         Initialize();
     }
     public void AddConnection(uint iNeuron, uint iWeight)
     {
-        NNConnection conn = new NNConnection(iNeuron, iWeight);
-        m_Connections.Add(conn);
+        NNConnection conn = new(iNeuron, iWeight);
+        Connections.Add(conn);
 
     }
     public void AddConnection(NNConnection conn)
     {
-        m_Connections.Add(conn);
+        Connections.Add(conn);
     }
     private void Initialize()
     {

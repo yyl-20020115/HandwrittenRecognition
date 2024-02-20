@@ -49,68 +49,76 @@
             // 
             // textBoxBackThreads
             // 
-            this.textBoxBackThreads.Location = new System.Drawing.Point(292, 17);
+            this.textBoxBackThreads.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxBackThreads.Location = new System.Drawing.Point(416, 16);
             this.textBoxBackThreads.Name = "textBoxBackThreads";
-            this.textBoxBackThreads.Size = new System.Drawing.Size(100, 20);
+            this.textBoxBackThreads.Size = new System.Drawing.Size(100, 21);
             this.textBoxBackThreads.TabIndex = 0;
             // 
             // textBoxILearningRateEta
             // 
-            this.textBoxILearningRateEta.Location = new System.Drawing.Point(292, 53);
+            this.textBoxILearningRateEta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxILearningRateEta.Location = new System.Drawing.Point(416, 49);
             this.textBoxILearningRateEta.Name = "textBoxILearningRateEta";
-            this.textBoxILearningRateEta.Size = new System.Drawing.Size(100, 20);
+            this.textBoxILearningRateEta.Size = new System.Drawing.Size(100, 21);
             this.textBoxILearningRateEta.TabIndex = 0;
             // 
             // textBoxMinimumLearningRate
             // 
-            this.textBoxMinimumLearningRate.Location = new System.Drawing.Point(292, 91);
+            this.textBoxMinimumLearningRate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxMinimumLearningRate.Location = new System.Drawing.Point(416, 84);
             this.textBoxMinimumLearningRate.Name = "textBoxMinimumLearningRate";
-            this.textBoxMinimumLearningRate.Size = new System.Drawing.Size(100, 20);
+            this.textBoxMinimumLearningRate.Size = new System.Drawing.Size(100, 21);
             this.textBoxMinimumLearningRate.TabIndex = 0;
             // 
             // textBoxLearningRateDecayRate
             // 
-            this.textBoxLearningRateDecayRate.Location = new System.Drawing.Point(292, 131);
+            this.textBoxLearningRateDecayRate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxLearningRateDecayRate.Location = new System.Drawing.Point(416, 121);
             this.textBoxLearningRateDecayRate.Name = "textBoxLearningRateDecayRate";
-            this.textBoxLearningRateDecayRate.Size = new System.Drawing.Size(100, 20);
+            this.textBoxLearningRateDecayRate.Size = new System.Drawing.Size(100, 21);
             this.textBoxLearningRateDecayRate.TabIndex = 0;
             // 
             // textBoxAfterEveryNBackPropagations
             // 
-            this.textBoxAfterEveryNBackPropagations.Location = new System.Drawing.Point(292, 169);
+            this.textBoxAfterEveryNBackPropagations.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxAfterEveryNBackPropagations.Location = new System.Drawing.Point(416, 156);
             this.textBoxAfterEveryNBackPropagations.Name = "textBoxAfterEveryNBackPropagations";
-            this.textBoxAfterEveryNBackPropagations.Size = new System.Drawing.Size(100, 20);
+            this.textBoxAfterEveryNBackPropagations.Size = new System.Drawing.Size(100, 21);
             this.textBoxAfterEveryNBackPropagations.TabIndex = 0;
             // 
             // textBoxStartingPatternNumber
             // 
-            this.textBoxStartingPatternNumber.Location = new System.Drawing.Point(292, 206);
+            this.textBoxStartingPatternNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxStartingPatternNumber.Location = new System.Drawing.Point(416, 190);
             this.textBoxStartingPatternNumber.Name = "textBoxStartingPatternNumber";
-            this.textBoxStartingPatternNumber.Size = new System.Drawing.Size(100, 20);
+            this.textBoxStartingPatternNumber.Size = new System.Drawing.Size(100, 21);
             this.textBoxStartingPatternNumber.TabIndex = 0;
             // 
             // textBoxEstimateofCurrentMSE
             // 
-            this.textBoxEstimateofCurrentMSE.Location = new System.Drawing.Point(292, 243);
+            this.textBoxEstimateofCurrentMSE.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxEstimateofCurrentMSE.Location = new System.Drawing.Point(416, 224);
             this.textBoxEstimateofCurrentMSE.Name = "textBoxEstimateofCurrentMSE";
-            this.textBoxEstimateofCurrentMSE.Size = new System.Drawing.Size(100, 20);
+            this.textBoxEstimateofCurrentMSE.Size = new System.Drawing.Size(100, 21);
             this.textBoxEstimateofCurrentMSE.TabIndex = 0;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(24, 23);
+            this.label1.Location = new System.Drawing.Point(24, 21);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(246, 13);
+            this.label1.Size = new System.Drawing.Size(293, 12);
             this.label1.TabIndex = 1;
             this.label1.Text = "Number of Backprop threads (one per CPU is best)";
             // 
             // button1
             // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button1.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.button1.Location = new System.Drawing.Point(52, 328);
+            this.button1.Location = new System.Drawing.Point(52, 314);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(131, 23);
+            this.button1.Size = new System.Drawing.Size(131, 21);
             this.button1.TabIndex = 2;
             this.button1.Text = "Start BackPropagation";
             this.button1.UseVisualStyleBackColor = true;
@@ -118,10 +126,11 @@
             // 
             // button2
             // 
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.button2.Location = new System.Drawing.Point(221, 328);
+            this.button2.Location = new System.Drawing.Point(345, 314);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(140, 23);
+            this.button2.Size = new System.Drawing.Size(140, 21);
             this.button2.TabIndex = 2;
             this.button2.Text = "Cancel BackPropagation";
             this.button2.UseVisualStyleBackColor = true;
@@ -129,72 +138,72 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 60);
+            this.label2.Location = new System.Drawing.Point(24, 55);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(258, 13);
+            this.label2.Size = new System.Drawing.Size(335, 12);
             this.label2.TabIndex = 1;
             this.label2.Text = "Initial Learning Rate eta (currently, eta = 0.00000001)";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(24, 98);
+            this.label3.Location = new System.Drawing.Point(24, 90);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(118, 13);
+            this.label3.Size = new System.Drawing.Size(131, 12);
             this.label3.TabIndex = 1;
             this.label3.Text = "Minimum Learning Rate";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(24, 138);
+            this.label4.Location = new System.Drawing.Point(24, 127);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(209, 13);
+            this.label4.Size = new System.Drawing.Size(257, 12);
             this.label4.TabIndex = 1;
             this.label4.Text = "Learning Rate Decay Rate (multiply eta by)";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(24, 176);
+            this.label5.Location = new System.Drawing.Point(24, 162);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(194, 13);
+            this.label5.Size = new System.Drawing.Size(239, 12);
             this.label5.TabIndex = 1;
             this.label5.Text = "After Every N Backpropagations: N =    ";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(24, 213);
+            this.label6.Location = new System.Drawing.Point(24, 197);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(220, 13);
+            this.label6.Size = new System.Drawing.Size(275, 12);
             this.label6.TabIndex = 1;
             this.label6.Text = "Starting Pattern Number (currently at 100000)";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(24, 250);
+            this.label7.Location = new System.Drawing.Point(24, 231);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(233, 13);
+            this.label7.Size = new System.Drawing.Size(299, 12);
             this.label7.TabIndex = 1;
             this.label7.Text = "Estimate of current MSE (enter 0.10 if uncertain)";
             // 
             // checkBoxDistortPatterns
             // 
             this.checkBoxDistortPatterns.AutoSize = true;
-            this.checkBoxDistortPatterns.Location = new System.Drawing.Point(27, 287);
+            this.checkBoxDistortPatterns.Location = new System.Drawing.Point(27, 265);
             this.checkBoxDistortPatterns.Name = "checkBoxDistortPatterns";
-            this.checkBoxDistortPatterns.Size = new System.Drawing.Size(303, 17);
+            this.checkBoxDistortPatterns.Size = new System.Drawing.Size(372, 16);
             this.checkBoxDistortPatterns.TabIndex = 3;
             this.checkBoxDistortPatterns.Text = "Distort Patterns (recommended for improved generalization)";
             this.checkBoxDistortPatterns.UseVisualStyleBackColor = true;
             // 
             // BackPropagationParametersForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(415, 357);
+            this.ClientSize = new System.Drawing.Size(539, 341);
             this.Controls.Add(this.checkBoxDistortPatterns);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -212,9 +221,11 @@
             this.Controls.Add(this.textBoxMinimumLearningRate);
             this.Controls.Add(this.textBoxILearningRateEta);
             this.Controls.Add(this.textBoxBackThreads);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "BackPropagationParametersForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "BackPropagationParametersForm";
+            this.Text = "Back Propagation Parameters";
             this.ResumeLayout(false);
             this.PerformLayout();
 

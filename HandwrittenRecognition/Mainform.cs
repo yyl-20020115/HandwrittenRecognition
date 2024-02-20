@@ -155,9 +155,9 @@ public partial class Mainform : Form
                     {
 
                         colors[0] = 255;
-                        colors[1] = Convert.ToByte(pArray[i * 28 + j]);
-                        colors[2] = Convert.ToByte(pArray[i * 28 + j]);
-                        colors[3] = Convert.ToByte(pArray[i * 28 + j]);
+                        colors[1] = (byte)(pArray[i * 28 + j]);
+                        colors[2] = (byte)(pArray[i * 28 + j]);
+                        colors[3] = (byte)(pArray[i * 28 + j]);
                         int m_ARGB = BitConverter.ToInt32(colors, 0);
                         bitmap.SetPixel(j, i, Color.FromArgb((int)m_ARGB));
                     }
@@ -203,9 +203,9 @@ public partial class Mainform : Form
                     {
 
                         colors[0] = 255;
-                        colors[1] = Convert.ToByte(pArray[i * 28 + j]);
-                        colors[2] = Convert.ToByte(pArray[i * 28 + j]);
-                        colors[3] = Convert.ToByte(pArray[i * 28 + j]);
+                        colors[1] = (byte)(pArray[i * 28 + j]);
+                        colors[2] = (byte)(pArray[i * 28 + j]);
+                        colors[3] = (byte)(pArray[i * 28 + j]);
                         int m_ARGB = BitConverter.ToInt32(colors, 0);
                         bitmap.SetPixel(j, i, Color.FromArgb((int)m_ARGB));
                     }
@@ -232,26 +232,26 @@ public partial class Mainform : Form
             {
                 BackPropagationParameters parameters = new BackPropagationParameters
                 {
-                    m_cNumThreads = (uint)_Preference.m_cNumBackpropThreads,
-                    m_InitialEta = _Preference.m_dInitialEtaLearningRate,
-                    m_MinimumEta = _Preference.m_dMinimumEtaLearningRate,
-                    m_EtaDecay = _Preference.m_dLearningRateDecay,
-                    m_AfterEvery = _Preference.m_nAfterEveryNBackprops,
-                    m_StartingPattern = 0,
-                    m_EstimatedCurrentMSE = 0.10,
-                    m_bDistortPatterns = true
+                    NumThreads = (uint)_Preference.NumBackpropThreads,
+                    InitialEta = _Preference.InitialEtaLearningRate,
+                    MinimumEta = _Preference.MinimumEtaLearningRate,
+                    EtaDecay = _Preference.LearningRateDecay,
+                    AfterEvery = _Preference.AfterEveryNBackprops,
+                    StartingPattern = 0,
+                    EstimatedCurrentMSE = 0.10,
+                    UseDistortPatterns = true
                 };
-                double eta = parameters.m_InitialEta;
-                parameters.m_strInitialEtaMessage = String.Format("Initial Learning Rate eta (currently, eta = {0})", eta);
+                double eta = parameters.InitialEta;
+                parameters.InitialEtaMessage = String.Format("Initial Learning Rate eta (currently, eta = {0})", eta);
                 int curPattern = 0;
-                parameters.m_strStartingPatternNum = String.Format("Starting Pattern Number (currently at {0})", curPattern);
+                parameters.StartingPatternNum = String.Format("Starting Pattern Number (currently at {0})", curPattern);
                 dlg.SetBackProParameters(parameters);
                 var m_result = dlg.ShowDialog();
                 if (m_result == DialogResult.OK)
                 {
                     parameters = dlg.GetBackProParameters();
-                    bool bRet = StartBackpropagation(parameters.m_StartingPattern, parameters.m_cNumThreads, parameters.m_InitialEta,
-                        parameters.m_MinimumEta, parameters.m_EtaDecay, parameters.m_AfterEvery, parameters.m_bDistortPatterns, parameters.m_EstimatedCurrentMSE);
+                    bool bRet = StartBackpropagation(parameters.StartingPattern, parameters.NumThreads, parameters.InitialEta,
+                        parameters.MinimumEta, parameters.EtaDecay, parameters.AfterEvery, parameters.UseDistortPatterns, parameters.EstimatedCurrentMSE);
                     if (bRet != false)
                     {
                         //do some thing
@@ -271,8 +271,8 @@ public partial class Mainform : Form
         if (iNumThreads > 10)  // 10 is arbitrary upper limit
             iNumThreads = 10;
         //initialize BackPropagation before process
-        _NN.m_etaLearningRate = initialEta;
-        _NN.m_etaLearningRatePrevious = initialEta;
+        _NN.EtaLearningRate = initialEta;
+        _NN.EtaLearningRatePrevious = initialEta;
 
         //run thread here
         _EventTrainingStopThread.Reset();
@@ -314,7 +314,7 @@ public partial class Mainform : Form
             m_dMinimumEta = minimumEta,
             m_dEtaDecay = etaDecay,
             m_nAfterEveryNBackprops = nAfterEvery,
-            m_bDistortPatterns = bDistortPatterns,
+            ShouldDistortPatterns = bDistortPatterns,
             m_dEstimatedCurrentMSE = estimatedCurrentMSE
             /* estimated number that will define whether a forward calculation's error is significant enough to warrant backpropagation*/
         };
@@ -348,7 +348,7 @@ public partial class Mainform : Form
         // vector of 29x29=841 pixels, and no weights/connections
 
         pLayer = new NNLayer("Layer00", null);
-        network.m_Layers.Add(pLayer);
+        network.Layers.Add(pLayer);
 
         for (ii = 0; ii < 841; ii++)
         {
@@ -366,7 +366,7 @@ public partial class Mainform : Form
         // So, there are 13x13x6 = 1014 neurons, (5x5+1)x6 = 156 weights
 
         pLayer = new NNLayer("Layer01", pLayer);
-        network.m_Layers.Add(pLayer);
+        network.Layers.Add(pLayer);
 
         for (ii = 0; ii < 1014; ii++)
         {
@@ -428,7 +428,7 @@ public partial class Mainform : Form
         // So, there are 5x5x50 = 1250 neurons, (5x5+1)x6x50 = 7800 weights
 
         pLayer = new NNLayer("Layer02", pLayer);
-        network.m_Layers.Add(pLayer);
+        network.Layers.Add(pLayer);
 
         for (ii = 0; ii < 1250; ii++)
         {
@@ -495,7 +495,7 @@ public partial class Mainform : Form
         // So, there are 100 neurons and 100*(1250+1)=125100 weights
 
         pLayer = new NNLayer("Layer03", pLayer);
-        network.m_Layers.Add(pLayer);
+        network.Layers.Add(pLayer);
 
         for (ii = 0; ii < 100; ii++)
         {
@@ -536,7 +536,7 @@ public partial class Mainform : Form
         // So, there are 10 neurons and 10*(100+1)=1010 weights
 
         pLayer = new NNLayer("Layer04", pLayer);
-        network.m_Layers.Add(pLayer);
+        network.Layers.Add(pLayer);
 
         for (ii = 0; ii < 10; ii++)
         {
@@ -645,10 +645,10 @@ public partial class Mainform : Form
         {
 
             //update Preferences parametters
-            if (_MnistTrainingDatabase.m_pImagePatterns.Count != _Preference.m_nItemsTrainingImages)
+            if (_MnistTrainingDatabase.m_pImagePatterns.Count != _Preference.ItemsTrainingImages)
             {
-                _Preference.m_nItemsTrainingImages = (uint)_MnistTrainingDatabase.m_pImagePatterns.Count;
-                _Preference.m_nItemsTrainingLabels = (uint)_MnistTrainingDatabase.m_pImagePatterns.Count;
+                _Preference.ItemsTrainingImages = (uint)_MnistTrainingDatabase.m_pImagePatterns.Count;
+                _Preference.ItemsTrainingLabels = (uint)_MnistTrainingDatabase.m_pImagePatterns.Count;
             }
             radioButtonMnistTrainDatabase.Enabled = true;
             radioButtonTrainingdatabase.Enabled = true;
@@ -666,10 +666,10 @@ public partial class Mainform : Form
         if (_bTestingDataReady)
         {
             //update Preferences parametters
-            if (_MinstTestingDatabase.m_pImagePatterns.Count != _Preference.m_nItemsTestingImages)
+            if (_MinstTestingDatabase.m_pImagePatterns.Count != _Preference.ItemsTestingImages)
             {
-                _Preference.m_nItemsTestingImages = (uint)_MinstTestingDatabase.m_pImagePatterns.Count;
-                _Preference.m_nItemsTestingLabels = (uint)_MinstTestingDatabase.m_pImagePatterns.Count;
+                _Preference.ItemsTestingImages = (uint)_MinstTestingDatabase.m_pImagePatterns.Count;
+                _Preference.ItemsTestingLabels = (uint)_MinstTestingDatabase.m_pImagePatterns.Count;
             }
             radioButtonMnistTestDatabase.Enabled = true;
             radioButtonMnistTestDatabase.Checked = true;
