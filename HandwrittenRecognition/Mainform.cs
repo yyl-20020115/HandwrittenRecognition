@@ -19,7 +19,7 @@ public partial class MainForm : Form
 {
     //MNIST Data set
     readonly MnistDatabase MnistTrainingDatabase;
-    readonly MnistDatabase MinstTestingDatabase;
+    readonly MnistDatabase MnistTestingDatabase;
     private MnistDatabase Mnistdatabase;
     readonly Preferences Preference;
 
@@ -62,12 +62,11 @@ public partial class MainForm : Form
 
     public MainForm()
     {
-
         InitializeComponent();
-        Preference = new Preferences();
-        MnistTrainingDatabase = new MnistDatabase();
-        MinstTestingDatabase = new MnistDatabase();
-        Mnistdatabase = MinstTestingDatabase;
+        Preference = new ();
+        MnistTrainingDatabase = new ();
+        MnistTestingDatabase = new ();
+        Mnistdatabase = MnistTestingDatabase;
         CurrentMnistPattern = 0;
         IsTrainingDataReady = false;
         IsTestingDataReady = false;
@@ -93,6 +92,66 @@ public partial class MainForm : Form
         MnistWeightsFile = "";
         IsTrainingThreadRuning = false;
         IsTestingThreadRuning = false;
+
+        foreach(var pd in new string[] { ".", "..", "..\\.." })
+        {
+            var cd = Path.GetFullPath(
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, pd));
+            var ti = Path.Combine(cd, "train-images.idx3-ubyte");
+            var tl = Path.Combine(cd, "train-labels.idx1-ubyte");
+            var ki = Path.Combine(cd, "t10k-images.idx3-ubyte");
+            var kl = Path.Combine(cd, "t10k-labels.idx1-ubyte");
+            if (File.Exists(ti)
+                && File.Exists(tl)
+                && File.Exists(ki)
+                && File.Exists(kl)
+                )
+            {
+                if (IsTrainingDataReady = MnistTrainingDatabase.LoadMinstFiles(ti, tl))
+                {
+
+                    //update Preferences parametters
+                    if (MnistTrainingDatabase.ImagePatterns.Count != Preference.ItemsTrainingImages)
+                    {
+                        Preference.ItemsTrainingImages = (uint)MnistTrainingDatabase.ImagePatterns.Count;
+                        Preference.ItemsTrainingLabels = (uint)MnistTrainingDatabase.ImagePatterns.Count;
+                    }
+                    radioButtonMnistTrainDatabase.Enabled = true;
+                    radioButtonTrainingdatabase.Enabled = true;
+                    buttonMnistNext.Enabled = true;
+                    buttonMnistPrevious.Enabled = true;
+                    IsDatabaseReady = IsTrainingDataReady;
+                    Mnistdatabase = MnistTrainingDatabase;
+                }
+                else
+                {
+                    radioButtonMnistTrainDatabase.Enabled = false;
+                }
+                if (IsTestingDataReady = MnistTestingDatabase.LoadMinstFiles(ki, kl))
+                {
+                    //update Preferences parametters
+                    if (MnistTestingDatabase.ImagePatterns.Count != Preference.ItemsTestingImages)
+                    {
+                        Preference.ItemsTestingImages = (uint)MnistTestingDatabase.ImagePatterns.Count;
+                        Preference.ItemsTestingLabels = (uint)MnistTestingDatabase.ImagePatterns.Count;
+                    }
+                    radioButtonMnistTestDatabase.Enabled = true;
+                    radioButtonMnistTestDatabase.Checked = true;
+                    radioButtonTestingdatabase.Enabled = true;
+                    radioButtonTestingdatabase.Checked = true;
+                    buttonMnistNext.Enabled = true;
+                    buttonMnistPrevious.Enabled = true;
+                    IsDatabaseReady = IsTestingDataReady;
+                    Mnistdatabase = MnistTestingDatabase;
+                }
+                else
+                {
+                    radioButtonMnistTestDatabase.Enabled = false;
+                }
+
+                break;
+            }
+        }
     }
     private void AddObject(int iCondition, object value)
     {
@@ -164,8 +223,6 @@ public partial class MainForm : Form
                 pictureBox2.Image = bitmap;
                 ImagePatternRecognization(CurrentMnistPattern);
                 label10.Text = CurrentMnistPattern.ToString();
-
-
             }
         }
 
@@ -225,9 +282,9 @@ public partial class MainForm : Form
     /// </summary>
     void OnStartBackpropagation()
     {
-        if ((IsTrainingDataReady) && (IsTrainingThreadRuning != true) && (IsTestingThreadRuning != true))
+        if ((IsTrainingDataReady) && (!IsTrainingThreadRuning) 
+            && (!IsTestingThreadRuning))
         {
-            using var dlg = new BackPropagationParametersForm();
             var parameters = new BackPropagationParameters
             {
                 NumThreads = (uint)Preference.NumBackpropThreads,
@@ -239,21 +296,29 @@ public partial class MainForm : Form
                 EstimatedCurrentMSE = 0.10,
                 UseDistortPatterns = true
             };
-            double eta = parameters.InitialEta;
-            parameters.InitialEtaMessage = String.Format("Initial Learning Rate eta (currently, eta = {0})", eta);
-            int curPattern = 0;
-            parameters.StartingPatternNum = String.Format("Starting Pattern Number (currently at {0})", curPattern);
-            dlg.SetBackProParameters(parameters);
-            var m_result = dlg.ShowDialog();
-            if (m_result == DialogResult.OK)
+            parameters.InitialEtaMessage = string.Format("Initial Learning Rate eta (currently, eta = {0})", parameters.InitialEta);
+            parameters.StartingPatternNum = string.Format("Starting Pattern Number (currently at {0})", 0);
+            if (this.checkBoxUseDialog.Checked)
             {
-                parameters = dlg.GetBackProParameters();
-                bool bRet = StartBackpropagation(parameters.StartingPattern, parameters.NumThreads, parameters.InitialEta,
+                using var dlg = new BackPropagationParametersForm();
+
+                dlg.SetBackProParameters(parameters);
+
+                var m_result = dlg.ShowDialog();
+                if (m_result == DialogResult.OK)
+                {
+                    parameters = dlg.GetBackProParameters();
+                }
+            }
+            { 
+                var bRet = StartBackpropagation(parameters.StartingPattern, parameters.NumThreads, parameters.InitialEta,
                     parameters.MinimumEta, parameters.EtaDecay, parameters.AfterEvery, parameters.UseDistortPatterns, parameters.EstimatedCurrentMSE);
-                if (bRet != false)
+                if (bRet)
                 {
                     //do some thing
                     IsTrainingThreadRuning = true;
+                    this.StartButton.Enabled = false;
+                    this.StopButton.Enabled = true;
                 }
             }
         }
@@ -317,8 +382,10 @@ public partial class MainForm : Form
 
         for (int i = 0; i < iNumThreads; i++)
         {
-            var trainer_thread = new Thread(ntraining.BackpropagationThread);
-            trainer_thread.Name = String.Format("Thread{0}", i + 1);
+            var trainer_thread = new Thread(ntraining.BackpropagationThread)
+            {
+                Name = string.Format("Thread{0}", i + 1)
+            };
             TrainerThreads.Add(trainer_thread);
             trainer_thread.Start();
 
@@ -348,8 +415,8 @@ public partial class MainForm : Form
 
         for (ii = 0; ii < 841; ii++)
         {
-            sLabel = String.Format("Layer00_Neuro{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new NNNeuron(sLabel));
+            sLabel = string.Format("Layer00_Neuro{0}_Num{1}", ii, icNeurons);
+            pLayer.Neurons.Add(new (sLabel));
             icNeurons++;
         }
 
@@ -366,17 +433,17 @@ public partial class MainForm : Form
 
         for (ii = 0; ii < 1014; ii++)
         {
-            sLabel = String.Format("Layer01_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new NNNeuron(sLabel));
+            sLabel = string.Format("Layer01_Neuron{0}_Num{1}", ii, icNeurons);
+            pLayer.Neurons.Add(new(sLabel));
             icNeurons++;
         }
 
         for (ii = 0; ii < 156; ii++)
         {
 
-            sLabel = String.Format("Layer01_Weigh{0}_Num{1}", ii, icWeights);
+            sLabel = string.Format("Layer01_Weigh{0}_Num{1}", ii, icWeights);
             initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
-            pLayer.Weights.Add(new NNWeight(sLabel, initWeight));
+            pLayer.Weights.Add(new (sLabel, initWeight));
         }
 
         // interconnections with previous layer: this is difficult
@@ -385,12 +452,12 @@ public partial class MainForm : Form
         // is also a top-down bitmap of size 13x13.  We move the kernel by TWO pixels, i.e., we
         // skip every other pixel in the input image
 
-        int[] kernelTemplate = new int[25] {
+        int[] kernelTemplate = [
                 0,  1,  2,  3,  4,
                 29, 30, 31, 32, 33,
                 58, 59, 60, 61, 62,
                 87, 88, 89, 90, 91,
-                116,117,118,119,120 };
+                116,117,118,119,120 ];
 
         int iNumWeight;
 
@@ -428,17 +495,17 @@ public partial class MainForm : Form
 
         for (ii = 0; ii < 1250; ii++)
         {
-            sLabel = String.Format("Layer02_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new NNNeuron(sLabel));
+            sLabel = string.Format("Layer02_Neuron{0}_Num{1}", ii, icNeurons);
+            pLayer.Neurons.Add(new (sLabel));
             icNeurons++;
         }
 
         for (ii = 0; ii < 7800; ii++)
         {
 
-            sLabel = String.Format("Layer02_Weight{0}_Num{1}", ii, icWeights);
+            sLabel = string.Format("Layer02_Weight{0}_Num{1}", ii, icWeights);
             initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
-            pLayer.Weights.Add(new NNWeight(sLabel, initWeight));
+            pLayer.Weights.Add(new (sLabel, initWeight));
         }
 
         // Interconnections with previous layer: this is difficult
@@ -536,17 +603,17 @@ public partial class MainForm : Form
 
         for (ii = 0; ii < 10; ii++)
         {
-            sLabel = String.Format("Layer04_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new NNNeuron(sLabel));
+            sLabel = string.Format("Layer04_Neuron{0}_Num{1}", ii, icNeurons);
+            pLayer.Neurons.Add(new (sLabel));
             icNeurons++;
         }
 
         for (ii = 0; ii < 1010; ii++)
         {
 
-            sLabel = String.Format("Layer04_Weight{0}_Num{1}", ii, icWeights);
+            sLabel = string.Format("Layer04_Weight{0}_Num{1}", ii, icWeights);
             initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
-            pLayer.Weights.Add(new NNWeight(sLabel, initWeight));
+            pLayer.Weights.Add(new (sLabel, initWeight));
         }
 
         // Interconnections with previous layer: fully-connected
@@ -578,7 +645,9 @@ public partial class MainForm : Form
         {
             if (StopTheads(TrainerThreads, EventTrainingStopThread, EventTrainingThreadStopped))
             {
-                BackPropagationThreadsFinished();		// set initial state of buttons
+                BackPropagationThreadsFinished();       // set initial state of buttons
+                this.StartButton.Enabled = true;
+                this.StopButton.Enabled = false;
             }
         }
     }
@@ -654,14 +723,14 @@ public partial class MainForm : Form
             radioButtonMnistTrainDatabase.Enabled = false;
             return;
         }
-        IsTestingDataReady = MinstTestingDatabase.LoadMinstFiles();
+        IsTestingDataReady = MnistTestingDatabase.LoadMinstFiles();
         if (IsTestingDataReady)
         {
             //update Preferences parametters
-            if (MinstTestingDatabase.ImagePatterns.Count != Preference.ItemsTestingImages)
+            if (MnistTestingDatabase.ImagePatterns.Count != Preference.ItemsTestingImages)
             {
-                Preference.ItemsTestingImages = (uint)MinstTestingDatabase.ImagePatterns.Count;
-                Preference.ItemsTestingLabels = (uint)MinstTestingDatabase.ImagePatterns.Count;
+                Preference.ItemsTestingImages = (uint)MnistTestingDatabase.ImagePatterns.Count;
+                Preference.ItemsTestingLabels = (uint)MnistTestingDatabase.ImagePatterns.Count;
             }
             radioButtonMnistTestDatabase.Enabled = true;
             radioButtonMnistTestDatabase.Checked = true;
@@ -670,7 +739,7 @@ public partial class MainForm : Form
             buttonMnistNext.Enabled = true;
             buttonMnistPrevious.Enabled = true;
             IsDatabaseReady = IsTestingDataReady;
-            Mnistdatabase = MinstTestingDatabase;
+            Mnistdatabase = MnistTestingDatabase;
         }
         else
         {
@@ -713,7 +782,7 @@ public partial class MainForm : Form
             {
                 if (IsTestingDataReady)
                 {
-                    nnTesting = new NNTestPatterns(nnNetwork, MinstTestingDatabase, Preference, IsTestingDataReady, EventTestingStopThread, EventTestingThreadStopped, this, mutexs);
+                    nnTesting = new NNTestPatterns(nnNetwork, MnistTestingDatabase, Preference, IsTestingDataReady, EventTestingStopThread, EventTestingThreadStopped, this, mutexs);
                     bDatabaseforTest = IsTestingDataReady;
                 }
                 else
@@ -852,13 +921,13 @@ public partial class MainForm : Form
     {
         if (radioButtonMnistTestDatabase.Checked)
         {
-            Mnistdatabase = MinstTestingDatabase;
+            Mnistdatabase = MnistTestingDatabase;
             IsDatabaseReady = IsTestingDataReady;
             CurrentMnistPattern = 0;
         }
         else
         {
-            Mnistdatabase = MinstTestingDatabase;
+            Mnistdatabase = MnistTestingDatabase;
             IsDatabaseReady = IsTrainingDataReady;
             CurrentMnistPattern = 0;
         }

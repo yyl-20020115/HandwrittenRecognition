@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace NeuralNetworkLibrary;
 
@@ -65,6 +66,61 @@ public class MnistDatabase
         RandomizedPatternSequence = null;
         IsFromRandomizedPatternSequence = false;
     }
+    public bool LoadMinstFiles(string image,string label)
+    {
+        //clear Image Pattern List
+        ImagePatterns?.Clear();
+        //close files if opened
+        if (IsImageFileOpen)
+        {
+
+            ImageFileStream.Close();
+            IsImageFileOpen = false;
+
+        }
+        if (IsLabelFileOpen)
+        {
+            LabelFileStream.Close();
+            IsLabelFileOpen = false;
+        }
+        //load Mnist Images files.
+        if (!MnistImageFileHeader(image))
+        {
+            MnistImageFileName = null;
+            IsImageFileOpen = false;
+            HasDatabase = false;
+            return false;
+        }
+        if (!MnistLabelFileHeader(label))
+        {
+            MnistLabelFileName = null;
+            IsLabelFileOpen = false;
+            HasDatabase = false;
+            return false;
+        }
+        //check the value if image file and label file have been opened successfully
+        if (LabelFileHeader.ItemsCount != ImageFileHeader.ItemsCount)
+        {
+            CloseMinstFiles();
+            HasDatabase = false;
+            return false;
+        }
+        ImagePatterns = new List<ImagePattern>(ImageFileHeader.ItemsCount);
+        RandomizedPatternSequence = new int[ImageFileHeader.ItemsCount];
+        for (int i = 0; i < ImageFileHeader.ItemsCount; i++)
+        {
+            var PatternArray = new byte[Defaults.Global_ImageSize * Defaults.Global_ImageSize];
+            var ImagePattern = new ImagePattern();
+            GetNextPattern(PatternArray, out byte m_nlabel, i, true);
+            ImagePattern.Pattern = PatternArray;
+            ImagePattern.Label = m_nlabel;
+            ImagePatterns.Add(ImagePattern);
+        }
+        HasDatabase = true;
+        CloseMinstFiles();
+        return true;
+    }
+
     public bool LoadMinstFiles()
     {
         //clear Image Pattern List
@@ -82,10 +138,6 @@ public class MnistDatabase
             LabelFileStream.Close();
             IsLabelFileOpen = false;
         }
-        Environment.CurrentDirectory 
-            = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-            "..", "..");
-
         //load Mnist Images files.
         if (!MnistImageFileHeader())
         {
@@ -116,7 +168,7 @@ public class MnistDatabase
         for (int i = 0; i < ImageFileHeader.ItemsCount; i++)
         {
             var PatternArray = new byte[Defaults.Global_ImageSize * Defaults.Global_ImageSize];
-            ImagePattern ImagePattern = new ImagePattern();
+            var ImagePattern = new ImagePattern();
             GetNextPattern(PatternArray, out byte m_nlabel, i, true);
             ImagePattern.Pattern = PatternArray;
             ImagePattern.Label = m_nlabel;
@@ -125,15 +177,50 @@ public class MnistDatabase
         HasDatabase = true;
         CloseMinstFiles();
         return true;
-
-
     }
+
+
     public void CloseMinstFiles()
     {
         LabelFileStream.Close();
         ImageFileStream.Close();
         IsImageFileOpen = false;
         IsLabelFileOpen = false;
+    }
+
+    protected bool MnistImageFileHeader(string file)
+    {
+        try
+        {
+            var m_byte = new byte[4];
+
+            ImageFileStream = new BinaryReader(new FileStream(file,FileMode.Open));
+            //Magic number 
+            ImageFileStream.Read(m_byte, 0, 4);
+            Array.Reverse(m_byte, 0, 4);
+            ImageFileHeader.Magic = BitConverter.ToInt32(m_byte, 0);
+            //number of images 
+            ImageFileStream.Read(m_byte, 0, 4);
+            //High-Endian format to Low-Endian format
+            Array.Reverse(m_byte, 0, 4);
+            ImageFileHeader.ItemsCount = BitConverter.ToInt32(m_byte, 0);
+            ItemCount = (uint)ImageFileHeader.ItemsCount;
+            //number of rows 
+            ImageFileStream.Read(m_byte, 0, 4);
+            Array.Reverse(m_byte, 0, 4);
+            ImageFileHeader.Rows = BitConverter.ToInt32(m_byte, 0);
+            //number of columns 
+            ImageFileStream.Read(m_byte, 0, 4);
+            Array.Reverse(m_byte, 0, 4);
+            ImageFileHeader.Cols = BitConverter.ToInt32(m_byte, 0);
+            IsImageFileOpen = true;
+            return true;
+        }
+        catch
+        {
+            IsImageFileOpen = false;
+            return false;
+        }
     }
     /// <summary>
     /// //Get MNIST Image file'header
@@ -143,7 +230,6 @@ public class MnistDatabase
 
         if (IsImageFileOpen == false)
         {
-            var m_byte = new byte[4];
             var dialog = new OpenFileDialog
             {
                 Filter = "Mnist Image file (*.idx3-ubyte)|*.idx3-ubyte",
@@ -152,37 +238,9 @@ public class MnistDatabase
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                MnistImageFileName = dialog.FileName;
+                return MnistImageFileHeader
+                    (MnistImageFileName = dialog.FileName);
 
-                try
-                {
-                    ImageFileStream = new BinaryReader(dialog.OpenFile());
-                    //Magic number 
-                    ImageFileStream.Read(m_byte, 0, 4);
-                    Array.Reverse(m_byte, 0, 4);
-                    ImageFileHeader.Magic = BitConverter.ToInt32(m_byte, 0);
-                    //number of images 
-                    ImageFileStream.Read(m_byte, 0, 4);
-                    //High-Endian format to Low-Endian format
-                    Array.Reverse(m_byte, 0, 4);
-                    ImageFileHeader.ItemsCount = BitConverter.ToInt32(m_byte, 0);
-                    ItemCount = (uint)ImageFileHeader.ItemsCount;
-                    //number of rows 
-                    ImageFileStream.Read(m_byte, 0, 4);
-                    Array.Reverse(m_byte, 0, 4);
-                    ImageFileHeader.Rows = BitConverter.ToInt32(m_byte, 0);
-                    //number of columns 
-                    ImageFileStream.Read(m_byte, 0, 4);
-                    Array.Reverse(m_byte, 0, 4);
-                    ImageFileHeader.Cols = BitConverter.ToInt32(m_byte, 0);
-                    IsImageFileOpen = true;
-                    return true;
-                }
-                catch
-                {
-                    IsImageFileOpen = false;
-                    return false;
-                }
 
             }
             return false;
@@ -190,6 +248,32 @@ public class MnistDatabase
         }
         return true;
 
+    }
+
+    protected bool MnistLabelFileHeader(string file)
+    {
+        try
+        {
+            var m_byte = new byte[4];
+
+            LabelFileStream = new System.IO.BinaryReader(new FileStream(file, FileMode.Open));
+            //Magic number 
+            LabelFileStream.Read(m_byte, 0, 4);
+            Array.Reverse(m_byte, 0, 4);
+            LabelFileHeader.Magic = BitConverter.ToInt32(m_byte, 0);
+            //number of images 
+            LabelFileStream.Read(m_byte, 0, 4);
+            //High-Endian format to Low-Endian format
+            Array.Reverse(m_byte, 0, 4);
+            LabelFileHeader.ItemsCount = BitConverter.ToInt32(m_byte, 0);
+            IsLabelFileOpen = true;
+            return true;
+        }
+        catch
+        {
+            IsLabelFileOpen = false;
+            return false;
+        }
     }
     /// <summary>
     /// Get MNIST Label file's header
@@ -199,33 +283,15 @@ public class MnistDatabase
 
         if (IsLabelFileOpen == false)
         {
-            var m_byte = new byte[4];
-            var openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog1.Filter = "Mnist Label file (*.idx1-ubyte)|*.idx1-ubyte";
-            openFileDialog1.Title = "Open MNIST Label file";
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            var dialog = new OpenFileDialog
             {
-                try
-                {
-                    MnistLabelFileName = openFileDialog1.FileName;
-                    LabelFileStream = new System.IO.BinaryReader(openFileDialog1.OpenFile());
-                    //Magic number 
-                    LabelFileStream.Read(m_byte, 0, 4);
-                    Array.Reverse(m_byte, 0, 4);
-                    LabelFileHeader.Magic = BitConverter.ToInt32(m_byte, 0);
-                    //number of images 
-                    LabelFileStream.Read(m_byte, 0, 4);
-                    //High-Endian format to Low-Endian format
-                    Array.Reverse(m_byte, 0, 4);
-                    LabelFileHeader.ItemsCount = BitConverter.ToInt32(m_byte, 0);
-                    IsLabelFileOpen = true;
-                    return true;
-                }
-                catch
-                {
-                    IsLabelFileOpen = false;
-                    return false;
-                }
+                Filter = "Mnist Label file (*.idx1-ubyte)|*.idx1-ubyte",
+                Title = "Open MNIST Label file"
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                return this.MnistLabelFileHeader(
+                    MnistLabelFileName = dialog.FileName);
             }
             return false;
 
