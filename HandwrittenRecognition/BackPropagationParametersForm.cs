@@ -21,26 +21,28 @@ public partial class BackPropagationParametersForm : Form
 {
 
     private BackPropagationParameters Parameters;
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="value"></param>
-    public void SetBackProParameters(BackPropagationParameters value)
+    public BackPropagationParameters BackProParameters
     {
-        Parameters = value;
-        textBoxAfterEveryNBackPropagations.Text = Parameters.AfterEvery.ToString();
-        textBoxBackThreads.Text = Parameters.NumThreads.ToString();
-        textBoxEstimateofCurrentMSE.Text = Parameters.EstimatedCurrentMSE.ToString();
-        textBoxILearningRateEta.Text = Parameters.InitialEta.ToString();
-        textBoxLearningRateDecayRate.Text = Parameters.EtaDecay.ToString();
-        textBoxMinimumLearningRate.Text = Parameters.MinimumEta.ToString();
-        textBoxStartingPatternNumber.Text = Parameters.StartingPattern.ToString();
-        checkBoxDistortPatterns.Checked = Parameters.UseDistortPatterns;
+        get => Parameters;
+        set
+        {
+            Parameters = value;
+            textBoxAfterEveryNBackPropagations.Text = Parameters.AfterEvery.ToString();
+            textBoxBackThreads.Text = Parameters.NumThreads.ToString();
+            textBoxEstimateofCurrentMSE.Text = Parameters.EstimatedCurrentMSE.ToString();
+            textBoxILearningRateEta.Text = Parameters.InitialEta.ToString();
+            textBoxLearningRateDecayRate.Text = Parameters.EtaDecay.ToString();
+            textBoxMinimumLearningRate.Text = Parameters.MinimumEta.ToString();
+            textBoxStartingPatternNumber.Text = Parameters.StartingPattern.ToString();
+            checkBoxDistortPatterns.Checked = Parameters.UseDistortPatterns;
+        }
     }
-    public BackPropagationParameters GetBackProParameters()
-    {
-        return Parameters;
-    }
+
     public BackPropagationParametersForm()
     {
         InitializeComponent();
@@ -57,7 +59,7 @@ public partial class BackPropagationParametersForm : Form
     }
 
 
-    private void Button1_Click(object sender, EventArgs e)
+    private void StartButton_Click(object sender, EventArgs e)
     {
         uint.TryParse(textBoxAfterEveryNBackPropagations.Text,out Parameters.AfterEvery);
         uint.TryParse(textBoxBackThreads.Text,out Parameters.NumThreads);

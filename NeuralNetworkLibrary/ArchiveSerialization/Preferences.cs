@@ -76,7 +76,7 @@ public class Preferences
         LearningRateDecay = 0.794328235;  // 0.794328235 = 0.001 down to 0.00001 in 20 epochs 
         MinimumEtaLearningRate = 0.00001;
         AfterEveryNBackprops = 60000;
-        NumBackpropThreads = 2;
+        NumBackpropThreads = 8;
 
         NumTestingThreads = 1;
 

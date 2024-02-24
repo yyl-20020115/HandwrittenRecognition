@@ -4,19 +4,9 @@ namespace NeuralNetworkLibrary;
 
 public class DErrorsList : List<double>
 {
-    public DErrorsList()
-    {
-
-    }
+    public DErrorsList() { }
     public DErrorsList(int capacity)
-        : base(capacity)
-    {
-
-    }
+        : base(capacity) { }
     public DErrorsList(IEnumerable<double> collection)
-        : base(collection)
-    {
-
-    }
-
+        : base(collection) { }
 }

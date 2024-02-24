@@ -32,10 +32,7 @@ public class Archive
 
     public bool IsStoring => op == ArchiveOp.Store;
 
-    public void Serialize(IArchiveSerialization s)
-    {
-        s.Serialize(this);
-    }
+    public void Serialize(IArchiveSerialization s) => s.Serialize(this);
 
     //////////////////////////////////////////////////////
     // write functions
@@ -60,7 +57,7 @@ public class Archive
     public void Write(float d) => writer.Write(d);
 
     public void Write(double d)
-    => writer.Write(d);
+        => writer.Write(d);
 
     public void Write(decimal d) =>
         // store decimals as Int64

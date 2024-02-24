@@ -2,8 +2,8 @@ namespace NeuralNetworkLibrary;
 
 public static class Defaults
 {
-    public const double Pi = 3.14159;
-    public const int SpeedOfLight = 300000; // km per sec.
+    public const double Pi = 3.1415926535897;
+    public const int SpeedOfLight = 299792458; // m/s.
     public const int Global_ImageSize = 28;
     public const int Global_VectorSize = 29;
     public const uint RAND_MAX = 0x7fff;

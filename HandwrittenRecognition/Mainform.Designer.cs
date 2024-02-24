@@ -47,7 +47,7 @@
             this.label8 = new System.Windows.Forms.Label();
             this.radioButtonMnistTestDatabase = new System.Windows.Forms.RadioButton();
             this.radioButtonMnistTrainDatabase = new System.Windows.Forms.RadioButton();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.PictureBox = new System.Windows.Forms.PictureBox();
             this.label7 = new System.Windows.Forms.Label();
             this.buttonMnistNext = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
@@ -56,6 +56,14 @@
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.checkBoxUseDialog = new System.Windows.Forms.CheckBox();
+            this.listBoxProgress = new System.Windows.Forms.ListBox();
+            this.StopButton = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.StartButton = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -68,17 +76,8 @@
             this.buttonMnistStopTest = new System.Windows.Forms.Button();
             this.buttonMnistTest = new System.Windows.Forms.Button();
             this.listBox2 = new System.Windows.Forms.ListBox();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.StopButton = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.StartButton = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.pictureBoxMain = new System.Windows.Forms.PictureBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.checkBoxUseDialog = new System.Windows.Forms.CheckBox();
+            this.treeViewDigits = new System.Windows.Forms.TreeView();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
@@ -87,15 +86,13 @@
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreads)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownNumberofTestPattern)).BeginInit();
-            this.tabPage1.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -109,7 +106,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1203, 25);
+            this.menuStrip1.Size = new System.Drawing.Size(752, 25);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -166,8 +163,8 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.groupBox1);
-            this.splitContainer2.Size = new System.Drawing.Size(509, 539);
-            this.splitContainer2.SplitterDistance = 192;
+            this.splitContainer2.Size = new System.Drawing.Size(512, 595);
+            this.splitContainer2.SplitterDistance = 211;
             this.splitContainer2.TabIndex = 0;
             // 
             // groupBox3
@@ -180,7 +177,7 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(256, 192);
+            this.groupBox3.Size = new System.Drawing.Size(256, 211);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Pattern Recognition";
@@ -243,7 +240,7 @@
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.radioButtonMnistTestDatabase);
             this.groupBox2.Controls.Add(this.radioButtonMnistTrainDatabase);
-            this.groupBox2.Controls.Add(this.pictureBox2);
+            this.groupBox2.Controls.Add(this.PictureBox);
             this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.buttonMnistNext);
             this.groupBox2.Controls.Add(this.label6);
@@ -251,9 +248,9 @@
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.groupBox2.Location = new System.Drawing.Point(256, 0);
+            this.groupBox2.Location = new System.Drawing.Point(259, 0);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(253, 192);
+            this.groupBox2.Size = new System.Drawing.Size(253, 211);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "MNIST manual test";
@@ -302,15 +299,15 @@
             this.radioButtonMnistTrainDatabase.Text = "Traning Database";
             this.radioButtonMnistTrainDatabase.UseVisualStyleBackColor = true;
             // 
-            // pictureBox2
+            // PictureBox
             // 
-            this.pictureBox2.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox2.Location = new System.Drawing.Point(6, 80);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(121, 106);
-            this.pictureBox2.TabIndex = 1;
-            this.pictureBox2.TabStop = false;
+            this.PictureBox.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.PictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.PictureBox.Location = new System.Drawing.Point(6, 80);
+            this.PictureBox.Name = "PictureBox";
+            this.PictureBox.Size = new System.Drawing.Size(121, 106);
+            this.PictureBox.TabIndex = 1;
+            this.PictureBox.TabStop = false;
             // 
             // label7
             // 
@@ -376,7 +373,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(509, 343);
+            this.groupBox1.Size = new System.Drawing.Size(512, 380);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Neural network training";
@@ -389,8 +386,93 @@
             this.tabControl1.Location = new System.Drawing.Point(3, 17);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(503, 266);
+            this.tabControl1.Size = new System.Drawing.Size(506, 303);
             this.tabControl1.TabIndex = 10;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.checkBoxUseDialog);
+            this.tabPage1.Controls.Add(this.listBoxProgress);
+            this.tabPage1.Controls.Add(this.StopButton);
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.StartButton);
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Controls.Add(this.label2);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(498, 277);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "NN Training";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxUseDialog
+            // 
+            this.checkBoxUseDialog.AutoSize = true;
+            this.checkBoxUseDialog.Location = new System.Drawing.Point(8, 63);
+            this.checkBoxUseDialog.Name = "checkBoxUseDialog";
+            this.checkBoxUseDialog.Size = new System.Drawing.Size(84, 16);
+            this.checkBoxUseDialog.TabIndex = 10;
+            this.checkBoxUseDialog.Text = "Use Dialog";
+            this.checkBoxUseDialog.UseVisualStyleBackColor = true;
+            // 
+            // listBoxProgress
+            // 
+            this.listBoxProgress.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.listBoxProgress.FormattingEnabled = true;
+            this.listBoxProgress.ItemHeight = 12;
+            this.listBoxProgress.Location = new System.Drawing.Point(3, 126);
+            this.listBoxProgress.Name = "listBoxProgress";
+            this.listBoxProgress.Size = new System.Drawing.Size(492, 148);
+            this.listBoxProgress.TabIndex = 9;
+            // 
+            // StopButton
+            // 
+            this.StopButton.Enabled = false;
+            this.StopButton.Location = new System.Drawing.Point(304, 61);
+            this.StopButton.Name = "StopButton";
+            this.StopButton.Size = new System.Drawing.Size(145, 21);
+            this.StopButton.TabIndex = 1;
+            this.StopButton.Text = "Stop";
+            this.StopButton.UseVisualStyleBackColor = true;
+            this.StopButton.Click += new System.EventHandler(this.StopBackPropagationbutton_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(115, 22);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(83, 12);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "0            ";
+            // 
+            // StartButton
+            // 
+            this.StartButton.Location = new System.Drawing.Point(113, 61);
+            this.StartButton.Name = "StartButton";
+            this.StartButton.Size = new System.Drawing.Size(136, 21);
+            this.StartButton.TabIndex = 0;
+            this.StartButton.Text = "Start BackPropagation";
+            this.StartButton.UseVisualStyleBackColor = true;
+            this.StartButton.Click += new System.EventHandler(this.StartBackPropagationbutton_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 22);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(107, 12);
+            this.label4.TabIndex = 8;
+            this.label4.Text = "Current pattern: ";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(252, 22);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(41, 12);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "MSE: 0";
             // 
             // tabPage2
             // 
@@ -536,108 +618,6 @@
             this.listBox2.Size = new System.Drawing.Size(489, 148);
             this.listBox2.TabIndex = 0;
             // 
-            // tabPage1
-            // 
-            this.tabPage1.Controls.Add(this.checkBoxUseDialog);
-            this.tabPage1.Controls.Add(this.listBox1);
-            this.tabPage1.Controls.Add(this.StopButton);
-            this.tabPage1.Controls.Add(this.label3);
-            this.tabPage1.Controls.Add(this.StartButton);
-            this.tabPage1.Controls.Add(this.label4);
-            this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(495, 240);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "NN Training";
-            this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // listBox1
-            // 
-            this.listBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 12;
-            this.listBox1.Location = new System.Drawing.Point(3, 89);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(489, 148);
-            this.listBox1.TabIndex = 9;
-            // 
-            // StopButton
-            // 
-            this.StopButton.Enabled = false;
-            this.StopButton.Location = new System.Drawing.Point(304, 61);
-            this.StopButton.Name = "StopButton";
-            this.StopButton.Size = new System.Drawing.Size(145, 21);
-            this.StopButton.TabIndex = 1;
-            this.StopButton.Text = "Stop";
-            this.StopButton.UseVisualStyleBackColor = true;
-            this.StopButton.Click += new System.EventHandler(this.StopBackPropagationbutton_Click);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(115, 22);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(83, 12);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "0            ";
-            // 
-            // StartButton
-            // 
-            this.StartButton.Location = new System.Drawing.Point(113, 61);
-            this.StartButton.Name = "StartButton";
-            this.StartButton.Size = new System.Drawing.Size(136, 21);
-            this.StartButton.TabIndex = 0;
-            this.StartButton.Text = "Start BackPropagation";
-            this.StartButton.UseVisualStyleBackColor = true;
-            this.StartButton.Click += new System.EventHandler(this.StartBackPropagationbutton_Click);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 22);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(107, 12);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "Current pattern: ";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(252, 22);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(41, 12);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "MSE: 0";
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 8F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.pictureBoxMain, 1, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 542F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(690, 539);
-            this.tableLayoutPanel1.TabIndex = 2;
-            // 
-            // pictureBoxMain
-            // 
-            this.pictureBoxMain.BackColor = System.Drawing.Color.White;
-            this.pictureBoxMain.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pictureBoxMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxMain.Location = new System.Drawing.Point(11, 3);
-            this.pictureBoxMain.Name = "pictureBoxMain";
-            this.pictureBoxMain.Size = new System.Drawing.Size(676, 533);
-            this.pictureBoxMain.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBoxMain.TabIndex = 1;
-            this.pictureBoxMain.TabStop = false;
-            // 
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -646,30 +626,28 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.tableLayoutPanel1);
+            this.splitContainer1.Panel1.Controls.Add(this.treeViewDigits);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(1203, 539);
-            this.splitContainer1.SplitterDistance = 690;
+            this.splitContainer1.Size = new System.Drawing.Size(752, 595);
+            this.splitContainer1.SplitterDistance = 236;
             this.splitContainer1.TabIndex = 0;
             // 
-            // checkBoxUseDialog
+            // treeViewDigits
             // 
-            this.checkBoxUseDialog.AutoSize = true;
-            this.checkBoxUseDialog.Location = new System.Drawing.Point(8, 63);
-            this.checkBoxUseDialog.Name = "checkBoxUseDialog";
-            this.checkBoxUseDialog.Size = new System.Drawing.Size(84, 16);
-            this.checkBoxUseDialog.TabIndex = 10;
-            this.checkBoxUseDialog.Text = "Use Dialog";
-            this.checkBoxUseDialog.UseVisualStyleBackColor = true;
+            this.treeViewDigits.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeViewDigits.Location = new System.Drawing.Point(0, 0);
+            this.treeViewDigits.Name = "treeViewDigits";
+            this.treeViewDigits.Size = new System.Drawing.Size(236, 595);
+            this.treeViewDigits.TabIndex = 0;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1203, 564);
+            this.ClientSize = new System.Drawing.Size(752, 620);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -691,17 +669,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreads)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownNumberofTestPattern)).EndInit();
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tableLayoutPanel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -723,7 +699,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.RadioButton radioButtonMnistTestDatabase;
         private System.Windows.Forms.RadioButton radioButtonMnistTrainDatabase;
-        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.PictureBox PictureBox;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button buttonMnistNext;
         private System.Windows.Forms.Label label6;
@@ -733,15 +709,13 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox listBoxProgress;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button StopButton;
         private System.Windows.Forms.Button StartButton;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.PictureBox pictureBoxMain;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button buttonPRPrevious;
@@ -763,6 +737,7 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewHelpToolStripMenuItem;
         private System.Windows.Forms.CheckBox checkBoxUseDialog;
+        private System.Windows.Forms.TreeView treeViewDigits;
     }
 }
 

@@ -7,14 +7,14 @@ namespace NeuralNetworkLibrary;
 public class NeuralNetwork : IArchiveSerialization
 {
     public double EtaLearningRatePrevious;
-    public double EtaLearningRate;
-    public uint BackpropsCounter;  // counter used in connection with Weight sanity check
-    public NNLayerList Layers;
+    public double EtaLearningRate = 0.001;
+    public uint BackpropsCounter = 0;  // counter used in connection with Weight sanity check
+    public NNLayerList Layers = [];
     public NeuralNetwork()
     {
-        EtaLearningRate = .001;  // arbitrary, so that brand-new NNs can be serialized with a non-ridiculous number
-        BackpropsCounter = 0;
-        Layers = [];
+        //EtaLearningRate = .001;  // arbitrary, so that brand-new NNs can be serialized with a non-ridiculous number
+        //BackpropsCounter = 0;
+        //Layers = [];
     }
 
     public void Calculate(double[] inputVector, int iCount,
@@ -26,8 +26,7 @@ public class NeuralNetwork : IArchiveSerialization
         // to the input vector
         if (Layers.Count > 1)
         {
-
-            int count = 0;
+            var count = 0;
             if (iCount != lit.Neurons.Count)
             {
                 return;
@@ -286,14 +285,12 @@ public class NeuralNetwork : IArchiveSerialization
         {
             // TODO: add loading code here
 
-            double eta;
-            ar.Read(out eta);
+            ar.Read(out double eta);
             EtaLearningRate = eta;  // two-step storage is needed since m_etaLearningRate is "volatile"
 
-            int nLayers;
             var pLayer = (NNLayer)null;
 
-            ar.Read(out nLayers);
+            ar.Read(out int nLayers);
             Layers.Clear();
             Layers = new NNLayerList(nLayers);
             for (int ii = 0; ii < nLayers; ii++)

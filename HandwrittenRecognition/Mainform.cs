@@ -10,7 +10,6 @@ using NeuralNetworkLibrary;
 namespace HandwrittenRecogniration;
 
 #region Public Delegates
-
 // delegates used to call MainForm functions from worker thread
 public delegate void DelegateAddObject(int i, Object s);
 public delegate void DelegateThreadFinished();
@@ -18,23 +17,23 @@ public delegate void DelegateThreadFinished();
 public partial class MainForm : Form
 {
     //MNIST Data set
-    readonly MnistDatabase MnistTrainingDatabase;
-    readonly MnistDatabase MnistTestingDatabase;
+    private readonly MnistDatabase MnistTrainingDatabase;
+    private readonly MnistDatabase MnistTestingDatabase;
     private MnistDatabase Mnistdatabase;
-    readonly Preferences Preference;
+    private readonly Preferences Preference;
 
-    bool IsTrainingDataReady;
-    bool IsTestingDataReady;
-    bool IsDatabaseReady;
-    bool IsTrainingThreadRuning;
-    bool IsTestingThreadRuning;
-    readonly NeuralNetwork NN;
-    readonly NeuralNetwork TrainingNN;
+    private bool IsTrainingDataReady;
+    private bool IsTestingDataReady;
+    private bool IsDatabaseReady;
+    private bool IsTrainingThreadRuning;
+    private bool IsTestingThreadRuning;
+    private readonly NeuralNetwork NN;
+    private readonly NeuralNetwork TrainingNN;
     /// <summary>
     /// 
     /// </summary>
     /// 
-    int CurrentMnistPattern;
+    private int CurrentMnistPattern;
     //static uint _iBackpropThreadIdentifier;  // static member used by threads to identify themselves
 
 
@@ -42,14 +41,14 @@ public partial class MainForm : Form
     //Thread
 
     // events used to stop worker thread
-    readonly ManualResetEvent EventTrainingStopThread;
-    readonly ManualResetEvent EventTrainingThreadStopped;
-    readonly ManualResetEvent EventTestingStopThread;
-    readonly ManualResetEvent EventTestingThreadStopped;
+    private readonly ManualResetEvent EventTrainingStopThread;
+    private readonly ManualResetEvent EventTrainingThreadStopped;
+    private readonly ManualResetEvent EventTestingStopThread;
+    private readonly ManualResetEvent EventTestingThreadStopped;
     //    
-    Mutex MainMutex;
-    List<Thread> TrainerThreads;
-    List<Thread> TestingThreads;
+    private readonly Mutex MainMutex;
+    private List<Thread> TrainerThreads;
+    private List<Thread> TestingThreads;
     // Delegate instances used to cal user interface functions 
     // from worker thread:
     public DelegateAddObject DelegateAddObject;
@@ -58,7 +57,7 @@ public partial class MainForm : Form
     /// <summary>
     /// My Defines
     /// </summary>
-    string MnistWeightsFile;
+    private string MnistWeightsFile;
 
     public MainForm()
     {
@@ -73,7 +72,7 @@ public partial class MainForm : Form
         IsDatabaseReady = IsTestingDataReady;
         radioButtonMnistTestDatabase.Checked = true;
         radioButtonMnistTrainDatabase.Checked = false;
-        pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+        PictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
 
         //Create Neural net work
         NN = new ();
@@ -109,7 +108,6 @@ public partial class MainForm : Form
             {
                 if (IsTrainingDataReady = MnistTrainingDatabase.LoadMinstFiles(ti, tl))
                 {
-
                     //update Preferences parametters
                     if (MnistTrainingDatabase.ImagePatterns.Count != Preference.ItemsTrainingImages)
                     {
@@ -164,7 +162,7 @@ public partial class MainForm : Form
                 label7.Text = (string)value;
                 break;
             case 3:
-                listBox1.Items.Add((string)value);
+                listBoxProgress.Items.Add((string)value);
                 break;
             case 4:
                 label2.Text = (string)value;
@@ -211,7 +209,6 @@ public partial class MainForm : Form
 
                     for (int j = 0; j < 28; j++)
                     {
-
                         colors[0] = 255;
                         colors[1] = (byte)(pArray[i * 28 + j]);
                         colors[2] = (byte)(pArray[i * 28 + j]);
@@ -220,7 +217,7 @@ public partial class MainForm : Form
                         bitmap.SetPixel(j, i, Color.FromArgb((int)m_ARGB));
                     }
                 }
-                pictureBox2.Image = bitmap;
+                PictureBox.Image = bitmap;
                 ImagePatternRecognization(CurrentMnistPattern);
                 label10.Text = CurrentMnistPattern.ToString();
             }
@@ -257,16 +254,15 @@ public partial class MainForm : Form
 
                     for (int j = 0; j < 28; j++)
                     {
-
                         colors[0] = 255;
-                        colors[1] = (byte)(pArray[i * 28 + j]);
-                        colors[2] = (byte)(pArray[i * 28 + j]);
-                        colors[3] = (byte)(pArray[i * 28 + j]);
+                        colors[1] = pArray[i * 28 + j];
+                        colors[2] = pArray[i * 28 + j];
+                        colors[3] = pArray[i * 28 + j];
                         int m_ARGB = BitConverter.ToInt32(colors, 0);
                         bitmap.SetPixel(j, i, Color.FromArgb((int)m_ARGB));
                     }
                 }
-                pictureBox2.Image = bitmap;
+                PictureBox.Image = bitmap;
                 ImagePatternRecognization(CurrentMnistPattern);
                 label10.Text = CurrentMnistPattern.ToString();
             }
@@ -302,12 +298,13 @@ public partial class MainForm : Form
             {
                 using var dlg = new BackPropagationParametersForm();
 
-                dlg.SetBackProParameters(parameters);
+                dlg.
+                BackProParameters = parameters;
 
                 var m_result = dlg.ShowDialog();
                 if (m_result == DialogResult.OK)
                 {
-                    parameters = dlg.GetBackProParameters();
+                    parameters = dlg.BackProParameters;
                 }
             }
             { 
@@ -470,7 +467,7 @@ public partial class MainForm : Form
                 for (jj = 0; jj < 13; jj++)
                 {
                     iNumWeight = fm * 26;  // 26 is the number of weights per feature map
-                    NNNeuron n = pLayer.Neurons[jj + ii * 13 + fm * 169];
+                    var n = pLayer.Neurons[jj + ii * 13 + fm * 169];
 
                     n.AddConnection((uint)Defaults.ULONG_MAX, (uint)iNumWeight++);  // bias weight
 
@@ -532,7 +529,7 @@ public partial class MainForm : Form
                 for (jj = 0; jj < 5; jj++)
                 {
                     iNumWeight = fm * 156;  // 26 is the number of weights per feature map
-                    NNNeuron n = pLayer.Neurons[jj + ii * 5 + fm * 25];
+                    var n = pLayer.Neurons[jj + ii * 5 + fm * 25];
 
                     n.AddConnection((uint)Defaults.ULONG_MAX, (uint)iNumWeight++);  // bias weight
 
@@ -570,9 +567,9 @@ public partial class MainForm : Form
         for (ii = 0; ii < 125100; ii++)
         {
 
-            sLabel = String.Format("Layer03_Weight{0}_Num{1}", ii, icWeights);
+            sLabel = string.Format("Layer03_Weight{0}_Num{1}", ii, icWeights);
             initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
-            pLayer.Weights.Add(new NNWeight(sLabel, initWeight));
+            pLayer.Weights.Add(new (sLabel, initWeight));
         }
 
         // Interconnections with previous layer: fully-connected
@@ -581,7 +578,7 @@ public partial class MainForm : Form
 
         for (fm = 0; fm < 100; fm++)
         {
-            NNNeuron n = pLayer.Neurons[fm];
+            var n = pLayer.Neurons[fm];
             n.AddConnection((uint)Defaults.ULONG_MAX, (uint)iNumWeight++);  // bias weight
 
             for (ii = 0; ii < 1250; ii++)

@@ -6,18 +6,18 @@ namespace NeuralNetworkLibrary;
 // Layer class
 public class NNLayer : IArchiveSerialization
 {
-    public NNWeightList Weights;
-    public NNNeuronList Neurons;
+    public NNWeightList Weights { get; private set; }
+    public NNNeuronList Neurons { get; private set; }
 
     public string Label;
     public NNLayer PreviousLayer;
-    private SigmoidFunction m_sigmoid;
+    private readonly SigmoidFunction Sigmoid;
     bool IsFloatingPointWarning;  // flag for one-time warning (per layer) about potential floating point overflow
     public NNLayer()
     {
         Label = string.Empty;
         PreviousLayer = null;
-        m_sigmoid = new SigmoidFunction();
+        Sigmoid = new ();
         Weights = [];
         Neurons = [];
         Initialize();
@@ -27,7 +27,7 @@ public class NNLayer : IArchiveSerialization
     {
         Label = str;
         PreviousLayer = pPrev;
-        m_sigmoid = new SigmoidFunction();
+        Sigmoid = new ();
         Weights = [];
         Neurons = [];
     }
@@ -56,12 +56,8 @@ public class NNLayer : IArchiveSerialization
                 }
             }
 
-            nit.Output = m_sigmoid.SIGMOID(dSum);
-
-
+            nit.Output = Sigmoid.SIGMOID(dSum);
         }
-
-
     }
     /////////////
     public bool Backpropagate(DErrorsList dErr_wrt_dXn /* in */,
@@ -83,10 +79,10 @@ public class NNLayer : IArchiveSerialization
         try
         {
             int ii, jj;
-            uint kk;
+            uint idx;
             int nIndex;
             double output;
-            DErrorsList dErr_wrt_dYn = new DErrorsList(Neurons.Count);
+            var dErr_wrt_dYn = new DErrorsList(Neurons.Count);
             //
             //	std::vector< double > dErr_wrt_dWn( m_Weights.size(), 0.0 );  // important to initialize to zero
             //////////////////////////////////////////////////
@@ -120,16 +116,9 @@ public class NNLayer : IArchiveSerialization
 
             for (ii = 0; ii < Neurons.Count; ii++)
             {
-                if (bMemorized != false)
-                {
-                    output = thisLayerOutput[ii];
-                }
-                else
-                {
-                    output = Neurons[ii].Output;
-                }
+                output = bMemorized ? thisLayerOutput[ii] : Neurons[ii].Output;
 
-                dErr_wrt_dYn.Add(m_sigmoid.DSIGMOID(output) * dErr_wrt_dXn[ii]);
+                dErr_wrt_dYn.Add(Sigmoid.DSIGMOID(output) * dErr_wrt_dXn[ii]);
             }
 
             // calculate dErr_wrt_Wn = Xnm1 * dErr_wrt_Yn
@@ -141,8 +130,8 @@ public class NNLayer : IArchiveSerialization
             {
                 foreach (var cit in nit.Connections)
                 {
-                    kk = cit.NeuronIndex;
-                    if (kk == 0xffffffff)
+                    idx = cit.NeuronIndex;
+                    if (idx == 0xffffffff)
                     {
                         output = 1.0;  // this is the bias weight
                     }
@@ -150,11 +139,11 @@ public class NNLayer : IArchiveSerialization
                     {
                         if (bMemorized != false)
                         {
-                            output = prevLayerOutput[(int)kk];
+                            output = prevLayerOutput[(int)idx];
                         }
                         else
                         {
-                            output = PreviousLayer.Neurons[(int)kk].Output;
+                            output = PreviousLayer.Neurons[(int)idx].Output;
                         }
                     }
                     dErr_wrt_dWn[cit.WeightIndex] += dErr_wrt_dYn[ii] * output;
@@ -171,13 +160,13 @@ public class NNLayer : IArchiveSerialization
             {
                 foreach (var cit in nit.Connections)
                 {
-                    kk = cit.NeuronIndex;
-                    if (kk != 0xffffffff)
+                    idx = cit.NeuronIndex;
+                    if (idx != 0xffffffff)
                     {
                         // we exclude ULONG_MAX, which signifies the phantom bias neuron with
                         // constant output of "1", since we cannot train the bias neuron
 
-                        nIndex = (int)kk;
+                        nIndex = (int)idx;
                         dErr_wrt_dXnm1[nIndex] += dErr_wrt_dYn[ii] * Weights[(int)cit.WeightIndex].Value;
                     }
 
@@ -224,17 +213,14 @@ public class NNLayer : IArchiveSerialization
 
                     oldValue = Weights[jj].Value;
                     newValue = oldValue - epsilon * dErr_wrt_dWn[jj];
-
-
-
                 }
             }
+            return true;
         }
         catch (Exception)
         {
             return false;
         }
-        return true;
     }
 
 
@@ -359,7 +345,7 @@ public class NNLayer : IArchiveSerialization
         {
 
             output = Neurons[ii].Output;
-            dTemp = m_sigmoid.DSIGMOID(output);
+            dTemp = Sigmoid.DSIGMOID(output);
             d2Err_wrt_dYn.Add(d2Err_wrt_dXn[ii] * dTemp * dTemp);
         }
         // calculate d2Err_wrt_Wn = ( Xnm1 )^2 * d2Err_wrt_Yn (where dE2rr_wrt_Yn is actually a second derivative)

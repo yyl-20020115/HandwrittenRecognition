@@ -31,7 +31,7 @@ public class MfcArchive : Archive
         }
     }
 
-    new public void Read(out Decimal d)
+    new public void Read(out decimal d)
     {
         // MFC stores decimal as 32-bit status value, 32-bit high value, and 32-bit low value
         Read(out int status);
@@ -50,11 +50,10 @@ public class MfcArchive : Archive
 
     }
 
-    new public void Read(out Boolean b)
+    new public void Read(out bool b)
     {
         // MFC stores bools as 32-bit "long"
-        Int32 l;
-        base.Read(out l);
+        base.Read(out int l);
         if (l == 0) b = false;
         else b = true;
     }
@@ -62,13 +61,11 @@ public class MfcArchive : Archive
 
     new public void Read(out DateTime dt)
     {
-        UInt32 status;
-        base.Read(out status); // status is a 32-bit "long" in C++
+        base.Read(out uint status); // status is a 32-bit "long" in C++
 
         // MFC stores dates as 8-byte double
-        Double l;
-        base.Read(out l);
-        dt = DateTime.FromOADate(l);
+        base.Read(out double d);
+        dt = DateTime.FromOADate(d);
 
         if (status == (UInt32)OleDateTimeStatus.Null ||
             status == (UInt32)OleDateTimeStatus.Invalid)
@@ -81,34 +78,23 @@ public class MfcArchive : Archive
 
     public void Read(out DateTime? dt)
     {
-        UInt32 status;
-        base.Read(out status); // status is a 32-bit "long" in C++
+        base.Read(out uint status); // status is a 32-bit "long" in C++
 
-        Double l;
-        base.Read(out l);
-        dt = DateTime.FromOADate(l);
+        base.Read(out double d);
+        dt = DateTime.FromOADate(d);
 
         // read in nullable type
-        if (status == (UInt32)OleDateTimeStatus.Null ||
-            status == (UInt32)OleDateTimeStatus.Invalid)
+        if (status == (uint)OleDateTimeStatus.Null ||
+            status == (uint)OleDateTimeStatus.Invalid)
         {
             dt = null;
         }
     }
 
-    new public void Read(out string s)
-    {
-        s = MFCStringReader.ReadCString(this.reader);
-    }
-    public void ReadUnicodeString(out string s)
-    {
-        s = base.reader.ReadString();
-    }
+    new public void Read(out string s) => s = MFCStringReader.ReadCString(this.reader);
+    public void ReadUnicodeString(out string s) => s = reader.ReadString();
 
     // Convert current low and high to 8-Byte C++ CURRENCY structure 
-    static public Int64 MakeInt64(Int32 l1, Int32 l2)
-    {
-        return ((UInt32)(((UInt32)(l1)) | ((UInt32)((UInt32)(l2))) << 32));
-    }
+    static public long MakeInt64(int l1, int l2) => ((uint)l1) | ((uint)l2 << 32);
 
 } // end of class

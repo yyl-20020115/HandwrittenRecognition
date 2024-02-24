@@ -36,8 +36,8 @@
             this.textBoxStartingPatternNumber = new System.Windows.Forms.TextBox();
             this.textBoxEstimateofCurrentMSE = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.StartButton = new System.Windows.Forms.Button();
+            this.CancelButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -112,28 +112,28 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Number of Backprop threads (one per CPU is best)";
             // 
-            // button1
+            // StartButton
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.button1.Location = new System.Drawing.Point(52, 314);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(131, 21);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Start BackPropagation";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            this.StartButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.StartButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.StartButton.Location = new System.Drawing.Point(52, 314);
+            this.StartButton.Name = "StartButton";
+            this.StartButton.Size = new System.Drawing.Size(131, 21);
+            this.StartButton.TabIndex = 2;
+            this.StartButton.Text = "Start BackPropagation";
+            this.StartButton.UseVisualStyleBackColor = true;
+            this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
             // 
-            // button2
+            // CancelButton
             // 
-            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.button2.Location = new System.Drawing.Point(345, 314);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(140, 21);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Cancel BackPropagation";
-            this.button2.UseVisualStyleBackColor = true;
+            this.CancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.CancelButton.Location = new System.Drawing.Point(345, 314);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(140, 21);
+            this.CancelButton.TabIndex = 2;
+            this.CancelButton.Text = "Cancel BackPropagation";
+            this.CancelButton.UseVisualStyleBackColor = true;
             // 
             // label2
             // 
@@ -205,8 +205,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(539, 341);
             this.Controls.Add(this.checkBoxDistortPatterns);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.StartButton);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -241,8 +241,8 @@
         private System.Windows.Forms.TextBox textBoxStartingPatternNumber;
         private System.Windows.Forms.TextBox textBoxEstimateofCurrentMSE;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button StartButton;
+        private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;

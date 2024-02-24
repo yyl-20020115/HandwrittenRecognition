@@ -4,23 +4,11 @@ namespace NeuralNetworkLibrary;
 
 public class NNWeightList : List<NNWeight>, IArchiveSerialization 
 {
-    public NNWeightList()
-    { 
-        
-    }
+    public NNWeightList() { }
     public NNWeightList(int capacity)
-        : base(capacity)
-    {
-        
-    }
+        : base(capacity) { }
     public NNWeightList(IEnumerable<NNWeight> collection)
-        : base(collection)
-    {
-        
-    }
-     
-    public void Serialize(Archive ar)
-    {
+        : base(collection) { }
 
-    }
+    public void Serialize(Archive ar) { }
 }

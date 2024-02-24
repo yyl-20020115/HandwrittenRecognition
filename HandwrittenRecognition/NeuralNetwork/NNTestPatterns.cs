@@ -60,9 +60,9 @@ public class NNTestPatterns : NNForwardPropagation
         //
         // thread is "owned" by the doc, and accepts a pointer to the doc
         // continuously backpropagates until m_bThreadAbortFlag is set to TRUE  	
-        double[] inputVector = new double[841];  // note: 29x29, not 28x28
-        double[] targetOutputVector = new double[10];
-        double[] actualOutputVector = new double[10];
+        var inputVector = new double[841];  // note: 29x29, not 28x28
+        var targetOutputVector = new double[10];
+        var actualOutputVector = new double[10];
         //
         for (int i = 0; i < 841; i++)
         {
@@ -74,10 +74,8 @@ public class NNTestPatterns : NNForwardPropagation
             actualOutputVector[i] = 0.0;
 
         }
-        //
-        byte label = 0;
-        int ii, jj;
 
+        int ii, jj;
 
         var memorizedNeuronOutputs = new NNNeuronOutputsList();
         //prepare for training
@@ -88,10 +86,11 @@ public class NNTestPatterns : NNForwardPropagation
         {
             Mutexs[1].WaitOne();
 
-            byte[] grayLevels = new byte[Preferences.RowsImages * Preferences.ColsImages];
+            var grayLevels = new byte[Preferences.RowsImages * Preferences.ColsImages];
             //iSequentialNum = m_MnistDataSet.GetCurrentPatternNumber(m_MnistDataSet.m_bFromRandomizedPatternSequence);
             MnistDataSet.ImagePatterns[(int)NextPattern].Pattern.CopyTo(grayLevels, 0);
-            label = MnistDataSet.ImagePatterns[(int)NextPattern].Label;
+            //
+            var label = MnistDataSet.ImagePatterns[(int)NextPattern].Label;
             if (label < 0) label = 0;
             if (label > 9) label = 9;
 
@@ -108,7 +107,7 @@ public class NNTestPatterns : NNForwardPropagation
             {
                 for (jj = 0; jj < Defaults.Global_ImageSize; ++jj)
                 {
-                    inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + Defaults.Global_ImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
+                    inputVector[1 + jj + 29 * (ii + 1)] = grayLevels[jj + Defaults.Global_ImageSize * ii] / 128.0 - 1.0;  // one is white, -one is black
                 }
             }
 
@@ -123,8 +122,8 @@ public class NNTestPatterns : NNForwardPropagation
 
             CalculateNeuralNet(inputVector, 841, actualOutputVector, 10, memorizedNeuronOutputs, false);
 
-            int iBestIndex = 0;
-            double maxValue = -99.0;
+            var iBestIndex = 0;
+            var maxValue = double.MinValue;
 
             for (ii = 0; ii < 10; ++ii)
             {
@@ -134,35 +133,28 @@ public class NNTestPatterns : NNForwardPropagation
                     maxValue = actualOutputVector[ii];
                 }
             }
-            string s = "";
+            var s = "";
             if (iBestIndex != label)
             {
-
                 MnistNum++;
                 s = "Pattern No:" + NextPattern.ToString() + " Recognized value:" + iBestIndex.ToString() + " Actual value:" + label.ToString();
-                if (MainForm != null)
-                    MainForm.Invoke(MainForm.DelegateAddObject, new Object[] { 6, s });
-
-
+                MainForm?.Invoke(MainForm.DelegateAddObject, [6, s]);
             }
             else
             {
                 s = NextPattern.ToString() + ", Mis Nums:" + MnistNum.ToString();
-                MainForm?.Invoke(MainForm.DelegateAddObject, new Object[] { 7, s });
+                MainForm?.Invoke(MainForm.DelegateAddObject, [7, s]);
             }
             // check if thread is cancelled
             if (StopEvent.WaitOne(0, true))
             {
                 // clean-up operations may be placed here
                 // ...
-                s = String.Format("Mnist Testing thread: {0} stoped", Thread.CurrentThread.Name);
+                s = string.Format("Mnist Testing thread: {0} stoped", Thread.CurrentThread.Name);
                 // Make synchronous call to main form.
                 // MainForm.AddString function runs in main thread.
                 // To make asynchronous call use BeginInvoke
-                if (MainForm != null)
-                {
-                    MainForm.Invoke(MainForm.DelegateAddObject, new Object[] { 8, s });
-                }
+                MainForm?.Invoke(MainForm.DelegateAddObject, new Object[] { 8, s });
 
                 // inform main thread that this thread stopped
                 StoppedEvent.Set();
@@ -173,8 +165,8 @@ public class NNTestPatterns : NNForwardPropagation
             Mutexs[1].ReleaseMutex();
         }
         {
-            string s = String.Format("Mnist Testing thread: {0} stoped", Thread.CurrentThread.Name);
-            MainForm.Invoke(MainForm.DelegateAddObject, new Object[] { 8, s });
+            var s = string.Format("Mnist Testing thread: {0} stoped", Thread.CurrentThread.Name);
+            MainForm?.Invoke(MainForm.DelegateAddObject, [8, s]);
         }
     }
     public void PatternRecognizingThread(int iPatternNo)
@@ -183,9 +175,9 @@ public class NNTestPatterns : NNForwardPropagation
         //
         // thread is "owned" by the doc, and accepts a pointer to the doc
         // continuously backpropagates until m_bThreadAbortFlag is set to TRUE  	
-        double[] inputVector = new double[841];  // note: 29x29, not 28x28
-        double[] targetOutputVector = new double[10];
-        double[] actualOutputVector = new double[10];
+        var inputVector = new double[841];  // note: 29x29, not 28x28
+        var targetOutputVector = new double[10];
+        var actualOutputVector = new double[10];
         //
         for (int i = 0; i < 841; i++)
         {
@@ -214,7 +206,7 @@ public class NNTestPatterns : NNForwardPropagation
         {
             Timer.Start();
         }
-        byte[] grayLevels = new byte[Preferences.RowsImages * Preferences.ColsImages];
+        var grayLevels = new byte[Preferences.RowsImages * Preferences.ColsImages];
         MnistDataSet.ImagePatterns[iPatternNo].Pattern.CopyTo(grayLevels, 0);
         label = MnistDataSet.ImagePatterns[iPatternNo].Label;
         NextPattern++;
@@ -235,7 +227,7 @@ public class NNTestPatterns : NNForwardPropagation
         {
             for (jj = 0; jj < Defaults.Global_ImageSize; ++jj)
             {
-                inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + Defaults.Global_ImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
+                inputVector[1 + jj + 29 * (ii + 1)] = grayLevels[jj + Defaults.Global_ImageSize * ii] / 128.0 - 1.0;  // one is white, -one is black
             }
         }
 
@@ -249,9 +241,9 @@ public class NNTestPatterns : NNForwardPropagation
         // forward calculate through the neural net
 
         CalculateNeuralNet(inputVector, 841, actualOutputVector, 10, memorizedNeuronOutputs, false);
-        int iBestIndex = 0;
-        double maxValue = -99.0;
-
+        var iBestIndex = 0;
+        var maxValue = double.MinValue;
+        //取最大值
         for (ii = 0; ii < 10; ++ii)
         {
             if (actualOutputVector[ii] > maxValue)
@@ -261,8 +253,8 @@ public class NNTestPatterns : NNForwardPropagation
             }
         }
 
-        string s = iBestIndex.ToString();
-        MainForm.Invoke(MainForm.DelegateAddObject, [2, s]);
+        var s = iBestIndex.ToString();
+        MainForm?.Invoke(MainForm.DelegateAddObject, [2, s]);
         // check if thread is cancelled
         Mutexs[1].ReleaseMutex();
 
@@ -273,9 +265,9 @@ public class NNTestPatterns : NNForwardPropagation
         //
         // thread is "owned" by the doc, and accepts a pointer to the doc
         // continuously backpropagates until m_bThreadAbortFlag is set to TRUE  	
-        double[] inputVector = new double[841];  // note: 29x29, not 28x28
-        double[] targetOutputVector = new double[10];
-        double[] actualOutputVector = new double[10];
+        var inputVector = new double[841];  // note: 29x29, not 28x28
+        var targetOutputVector = new double[10];
+        var actualOutputVector = new double[10];
         //
         for (int i = 0; i < 841; i++)
         {
@@ -317,7 +309,7 @@ public class NNTestPatterns : NNForwardPropagation
         {
             for (jj = 0; jj < Defaults.Global_ImageSize; ++jj)
             {
-                inputVector[1 + jj + 29 * (ii + 1)] = (double)((int)(byte)grayLevels[jj + Defaults.Global_ImageSize * ii]) / 128.0 - 1.0;  // one is white, -one is black
+                inputVector[1 + jj + 29 * (ii + 1)] = grayLevels[jj + Defaults.Global_ImageSize * ii] / 128.0 - 1.0;  // one is white, -one is black
             }
         }
 
@@ -331,8 +323,8 @@ public class NNTestPatterns : NNForwardPropagation
         // forward calculate through the neural net
 
         CalculateNeuralNet(inputVector, 841, actualOutputVector, 10, memorizedNeuronOutputs, false);
-        int iBestIndex = 0;
-        double maxValue = -99.0;
+        var iBestIndex = 0;
+        var maxValue = double.MinValue;
 
         for (ii = 0; ii < 10; ++ii)
         {
@@ -343,8 +335,8 @@ public class NNTestPatterns : NNForwardPropagation
             }
         }
 
-        string s = iBestIndex.ToString();
-        MainForm.Invoke(MainForm.DelegateAddObject, new Object[] { 1, s });
+        var s = iBestIndex.ToString();
+        MainForm?.Invoke(MainForm.DelegateAddObject, [1, s]);
         // check if thread is cancelled
 
         Mutexs[1].ReleaseMutex();

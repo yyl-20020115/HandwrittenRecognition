@@ -7,14 +7,7 @@ public class NNNeuron : IArchiveSerialization
     public readonly string Label;
     public double Output;
     public readonly NNConnectionList Connections;
-    public NNNeuron()
-    {
-        Initialize();
-        Label = "";
-        Output = 0.0;
-        Connections = [];
-    }
-    public NNNeuron(string str)
+    public NNNeuron(string str = "")
     {
         Label = str;
         Output = 0.0;
@@ -29,13 +22,9 @@ public class NNNeuron : IArchiveSerialization
         Initialize();
     }
     public void AddConnection(uint iNeuron, uint iWeight)
-    {
-        AddConnection(new(iNeuron, iWeight));
-    }
+        => AddConnection(new(iNeuron, iWeight));
     public void AddConnection(NNConnection conn)
-    {
-        Connections.Add(conn);
-    }
+        => Connections.Add(conn);
     private void Initialize()
     {
 

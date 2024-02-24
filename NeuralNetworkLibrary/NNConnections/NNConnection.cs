@@ -3,24 +3,10 @@ namespace NeuralNetworkLibrary;
 
 // Connection class
 
-public class NNConnection : IArchiveSerialization
+public class NNConnection(uint iNeuron = 0xffffffff, uint iWeight = 0xffffffff) : IArchiveSerialization
 {
-    public uint NeuronIndex;
-    public uint WeightIndex;
-    public NNConnection()
-    {
-        NeuronIndex = 0xffffffff;
-        WeightIndex = 0xffffffff;
+    public uint NeuronIndex = iNeuron;
+    public uint WeightIndex = iWeight;
 
-    }
-    public NNConnection(uint iNeuron, uint iWeight)
-    {
-        NeuronIndex = iNeuron;
-        WeightIndex = iWeight;
-    }
-
-    public void Serialize(Archive ar)
-    {
-
-    }
+    public void Serialize(Archive ar) { }
 }
