@@ -244,22 +244,21 @@ public partial class MainForm : Form
             if (CurrentMnistPattern > 1)
             {
                 CurrentMnistPattern -= 1;
-                var bitmap = new Bitmap((int)Defaults.Global_ImageSize, (int)Defaults.Global_ImageSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                byte[] pArray = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Pattern;
+                var bitmap = new Bitmap(Defaults.Global_ImageSize, Defaults.Global_ImageSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                var pArray = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Pattern;
                 uint ulabel = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Label;
                 label6.Text = ulabel.ToString();
-                byte[] colors = new byte[4];
+                var colors = new byte[4];
                 for (int i = 0; i < 28; i++)
                 {
-
                     for (int j = 0; j < 28; j++)
                     {
                         colors[0] = 255;
                         colors[1] = pArray[i * 28 + j];
                         colors[2] = pArray[i * 28 + j];
                         colors[3] = pArray[i * 28 + j];
-                        int m_ARGB = BitConverter.ToInt32(colors, 0);
-                        bitmap.SetPixel(j, i, Color.FromArgb((int)m_ARGB));
+                        int rgb = BitConverter.ToInt32(colors, 0);
+                        bitmap.SetPixel(j, i, Color.FromArgb(rgb));
                     }
                 }
                 PictureBox.Image = bitmap;
@@ -297,20 +296,18 @@ public partial class MainForm : Form
             if (this.checkBoxUseDialog.Checked)
             {
                 using var dlg = new BackPropagationParametersForm();
+                dlg.BackProParameters = parameters;
 
-                dlg.
-                BackProParameters = parameters;
-
-                var m_result = dlg.ShowDialog();
-                if (m_result == DialogResult.OK)
+                var result = dlg.ShowDialog();
+                if (result == DialogResult.OK)
                 {
                     parameters = dlg.BackProParameters;
                 }
             }
             { 
-                var bRet = StartBackpropagation(parameters.StartingPattern, parameters.NumThreads, parameters.InitialEta,
+                var ret = StartBackpropagation(parameters.StartingPattern, parameters.NumThreads, parameters.InitialEta,
                     parameters.MinimumEta, parameters.EtaDecay, parameters.AfterEvery, parameters.UseDistortPatterns, parameters.EstimatedCurrentMSE);
-                if (bRet)
+                if (ret)
                 {
                     //do some thing
                     IsTrainingThreadRuning = true;
@@ -324,7 +321,6 @@ public partial class MainForm : Form
     private bool StartBackpropagation(uint iStartPattern /* =0 */, uint iNumThreads /* =2 */, double initialEta /* =0.005 */, double minimumEta /* =0.000001 */, double etaDecay /* =0.990 */,
                                  uint nAfterEvery  /* =1000 */, bool bDistortPatterns /* =TRUE */, double estimatedCurrentMSE /* =1.0 */)
     {
-
         if (iNumThreads < 1)
             iNumThreads = 1;
         if (iNumThreads > 10)  // 10 is arbitrary upper limit
@@ -394,27 +390,32 @@ public partial class MainForm : Form
     /////////////////////////
     private bool CreateNNNetWork(NeuralNetwork network)
     {
+        this.treeViewDigits.Nodes.Clear();
 
         NNLayer pLayer;
-
         int ii, jj, kk;
         int icNeurons = 0;
         int icWeights = 0;
         double initWeight;
-        String sLabel;
-        var m_rdm = new Random();
+        string sLabel;
+        var random = new Random();
         // layer zero, the input layer.
         // Create neurons: exactly the same number of neurons as the input
         // vector of 29x29=841 pixels, and no weights/connections
-
         pLayer = new NNLayer("Layer00", null);
         network.Layers.Add(pLayer);
 
+        var layerNode = new TreeNode(pLayer.Label) { Tag = pLayer };
+        this.treeViewDigits.Nodes.Add(layerNode);
         for (ii = 0; ii < 841; ii++)
         {
             sLabel = string.Format("Layer00_Neuro{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new (sLabel));
+            var neuron = new NNNeuron(sLabel);
+            pLayer.Neurons.Add(neuron);
             icNeurons++;
+
+            var neuronNode = new TreeNode(sLabel) { Tag = neuron };
+            layerNode.Nodes.Add(neuronNode);
         }
 
         //double UNIFORM_PLUS_MINUS_ONE= (double)(2.0 * m_rdm.Next())/Constants.RAND_MAX - 1.0 ;
@@ -428,18 +429,24 @@ public partial class MainForm : Form
         pLayer = new NNLayer("Layer01", pLayer);
         network.Layers.Add(pLayer);
 
+        layerNode = new TreeNode(pLayer.Label) { Tag = pLayer };
+        this.treeViewDigits.Nodes.Add(layerNode);
+
         for (ii = 0; ii < 1014; ii++)
         {
             sLabel = string.Format("Layer01_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new(sLabel));
+            var neuron = new NNNeuron(sLabel);
+            pLayer.Neurons.Add(neuron);
             icNeurons++;
+
+            var neuronNode = new TreeNode(sLabel) { Tag = neuron };
+            layerNode.Nodes.Add(neuronNode);
         }
 
         for (ii = 0; ii < 156; ii++)
         {
-
             sLabel = string.Format("Layer01_Weigh{0}_Num{1}", ii, icWeights);
-            initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
+            initWeight = 0.05 * (2.0 * random.NextDouble() - 1.0);
             pLayer.Weights.Add(new (sLabel, initWeight));
         }
 
@@ -489,19 +496,25 @@ public partial class MainForm : Form
 
         pLayer = new NNLayer("Layer02", pLayer);
         network.Layers.Add(pLayer);
+        layerNode = new TreeNode(pLayer.Label) { Tag = pLayer };
+        this.treeViewDigits.Nodes.Add(layerNode);
 
         for (ii = 0; ii < 1250; ii++)
         {
             sLabel = string.Format("Layer02_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new (sLabel));
+            var neuron = new NNNeuron(sLabel);
+            pLayer.Neurons.Add(neuron);
             icNeurons++;
+
+            var neuronNode = new TreeNode(sLabel) { Tag = neuron };
+            layerNode.Nodes.Add(neuronNode);
+
         }
 
         for (ii = 0; ii < 7800; ii++)
         {
-
             sLabel = string.Format("Layer02_Weight{0}_Num{1}", ii, icWeights);
-            initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
+            initWeight = 0.05 * (2.0 * random.NextDouble() - 1.0);
             pLayer.Weights.Add(new (sLabel, initWeight));
         }
 
@@ -514,12 +527,12 @@ public partial class MainForm : Form
         // skip every other pixel in the input image.  The result is 50 different 5x5 top-down bitmap
         // feature maps
 
-        int[] kernelTemplate2 = new int[25]{
+        int[] kernelTemplate2 = [
                 0,  1,  2,  3,  4,
                 13, 14, 15, 16, 17,
                 26, 27, 28, 29, 30,
                 39, 40, 41, 42, 43,
-                52, 53, 54, 55, 56   };
+                52, 53, 54, 55, 56   ];
 
 
         for (fm = 0; fm < 50; fm++)
@@ -556,19 +569,26 @@ public partial class MainForm : Form
 
         pLayer = new NNLayer("Layer03", pLayer);
         network.Layers.Add(pLayer);
+        layerNode = new TreeNode(pLayer.Label) { Tag = pLayer };
+        this.treeViewDigits.Nodes.Add(layerNode);
 
         for (ii = 0; ii < 100; ii++)
         {
-            sLabel = String.Format("Layer03_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new NNNeuron(sLabel));
+            sLabel = string.Format("Layer03_Neuron{0}_Num{1}", ii, icNeurons);
+
+            var neuron = new NNNeuron(sLabel);
+            pLayer.Neurons.Add(neuron);
             icNeurons++;
+
+            var neuronNode = new TreeNode(sLabel) { Tag = neuron };
+            layerNode.Nodes.Add(neuronNode);
+
         }
 
         for (ii = 0; ii < 125100; ii++)
         {
-
             sLabel = string.Format("Layer03_Weight{0}_Num{1}", ii, icWeights);
-            initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
+            initWeight = 0.05 * (2.0 * random.NextDouble() - 1.0);
             pLayer.Weights.Add(new (sLabel, initWeight));
         }
 
@@ -597,19 +617,24 @@ public partial class MainForm : Form
 
         pLayer = new NNLayer("Layer04", pLayer);
         network.Layers.Add(pLayer);
+        layerNode = new TreeNode(pLayer.Label) { Tag = pLayer };
+        this.treeViewDigits.Nodes.Add(layerNode);
 
         for (ii = 0; ii < 10; ii++)
         {
             sLabel = string.Format("Layer04_Neuron{0}_Num{1}", ii, icNeurons);
-            pLayer.Neurons.Add(new (sLabel));
+            var neuron = new NNNeuron(sLabel);
+            pLayer.Neurons.Add(neuron);
             icNeurons++;
+
+            var neuronNode = new TreeNode(sLabel) { Tag = neuron };
+            layerNode.Nodes.Add(neuronNode);
         }
 
         for (ii = 0; ii < 1010; ii++)
         {
-
             sLabel = string.Format("Layer04_Weight{0}_Num{1}", ii, icWeights);
-            initWeight = 0.05 * (2.0 * m_rdm.NextDouble() - 1.0);
+            initWeight = 0.05 * (2.0 * random.NextDouble() - 1.0);
             pLayer.Weights.Add(new (sLabel, initWeight));
         }
 
@@ -627,7 +652,6 @@ public partial class MainForm : Form
                 n.AddConnection((uint)ii, (uint)iNumWeight++);
             }
         }
-
         return true;
     }
 
