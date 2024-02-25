@@ -72,7 +72,6 @@ public class NNTestPatterns : NNForwardPropagation
         {
             targetOutputVector[i] = 0.0;
             actualOutputVector[i] = 0.0;
-
         }
 
         int ii, jj;
@@ -138,12 +137,12 @@ public class NNTestPatterns : NNForwardPropagation
             {
                 MnistNum++;
                 s = "Pattern No:" + NextPattern.ToString() + " Recognized value:" + iBestIndex.ToString() + " Actual value:" + label.ToString();
-                MainForm?.Invoke(MainForm.DelegateAddObject, [6, s]);
+                MainForm?.Invoke(MainForm.DelegateAddText, [6, s]);
             }
             else
             {
                 s = NextPattern.ToString() + ", Mis Nums:" + MnistNum.ToString();
-                MainForm?.Invoke(MainForm.DelegateAddObject, [7, s]);
+                MainForm?.Invoke(MainForm.DelegateAddText, [7, s]);
             }
             // check if thread is cancelled
             if (StopEvent.WaitOne(0, true))
@@ -154,7 +153,7 @@ public class NNTestPatterns : NNForwardPropagation
                 // Make synchronous call to main form.
                 // MainForm.AddString function runs in main thread.
                 // To make asynchronous call use BeginInvoke
-                MainForm?.Invoke(MainForm.DelegateAddObject, new Object[] { 8, s });
+                MainForm?.Invoke(MainForm.DelegateAddText, new Object[] { 8, s });
 
                 // inform main thread that this thread stopped
                 StoppedEvent.Set();
@@ -166,7 +165,7 @@ public class NNTestPatterns : NNForwardPropagation
         }
         {
             var s = string.Format("Mnist Testing thread: {0} stoped", Thread.CurrentThread.Name);
-            MainForm?.Invoke(MainForm.DelegateAddObject, [8, s]);
+            MainForm?.Invoke(MainForm.DelegateAddText, [8, s]);
         }
     }
     public void PatternRecognizingThread(int iPatternNo)
@@ -187,14 +186,10 @@ public class NNTestPatterns : NNForwardPropagation
         {
             targetOutputVector[i] = 0.0;
             actualOutputVector[i] = 0.0;
-
         }
-
 
         byte label = 0;
         int ii, jj;
-
-
         var memorizedNeuronOutputs = new NNNeuronOutputsList();
         //prepare for training
         NextPattern = 0;
@@ -254,7 +249,7 @@ public class NNTestPatterns : NNForwardPropagation
         }
 
         var s = iBestIndex.ToString();
-        MainForm?.Invoke(MainForm.DelegateAddObject, [2, s]);
+        MainForm?.Invoke(MainForm.DelegateAddText, [2, s]);
         // check if thread is cancelled
         Mutexs[1].ReleaseMutex();
 
@@ -277,14 +272,11 @@ public class NNTestPatterns : NNForwardPropagation
         {
             targetOutputVector[i] = 0.0;
             actualOutputVector[i] = 0.0;
-
         }
         //
 
         byte label = 0;
         int ii, jj;
-
-
         var memorizedNeuronOutputs = new NNNeuronOutputsList();
 
 
@@ -336,10 +328,8 @@ public class NNTestPatterns : NNForwardPropagation
         }
 
         var s = iBestIndex.ToString();
-        MainForm?.Invoke(MainForm.DelegateAddObject, [1, s]);
+        MainForm?.Invoke(MainForm.DelegateAddText, [1, s]);
         // check if thread is cancelled
-
         Mutexs[1].ReleaseMutex();
-
     }
 }

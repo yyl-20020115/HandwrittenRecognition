@@ -70,7 +70,6 @@ public class NNTrainPatterns : NNForwardPropagation
             double dEtaDecay, double dMinimumEta, double dEstimatedCurrentMSE,  // this number will be changed by one thread and used by others
             bool bDistortTrainingPatterns)
     {
-
         AfterEveryNBackprops = nAfterEveryNBackprops;
         EtaDecay = dEtaDecay;
         MinimumEta = dMinimumEta;
@@ -114,7 +113,7 @@ public class NNTrainPatterns : NNForwardPropagation
         // Make synchronous call to main form.
         // MainForm.AddString function runs in main thread.
         // To make asynchronous call use BeginInvoke
-        MainForm?.Invoke(MainForm.DelegateAddObject, [3, s]);
+        MainForm?.Invoke(MainForm.DelegateAddText, [3, s]);
 
         // some of this code is similar to the BackpropagationThread() code
 
@@ -189,7 +188,7 @@ public class NNTrainPatterns : NNForwardPropagation
                 // Make synchronous call to main form.
                 // MainForm.AddString function runs in main thread.
                 // To make asynchronous call use BeginInvoke
-                MainForm?.Invoke(MainForm.DelegateAddObject, [3, ss]);
+                MainForm?.Invoke(MainForm.DelegateAddText, [3, ss]);
                 // inform main thread that this thread stopped
                 StoppedEvent.Set();
 
@@ -199,7 +198,7 @@ public class NNTrainPatterns : NNForwardPropagation
 
         Network.DivideHessianInformationBy(numPatternsSampled);
         s = " Caculation of Hessian...completed";
-        MainForm?.Invoke(MainForm.DelegateAddObject, [3, s]);
+        MainForm?.Invoke(MainForm.DelegateAddText, [3, s]);
         Mutexs[1].ReleaseMutex();
     }
 
@@ -262,8 +261,6 @@ public class NNTrainPatterns : NNForwardPropagation
             Network.EtaLearningRatePrevious = Network.EtaLearningRate;
             Network.EtaLearningRate = eta;
         }
-
-
         // determine if it's time to adjust the Hessian (currently once per epoch)
 
         if ((NeedHessian) || ((Backprops % Preferences.ItemsTrainingImages) == 0))
@@ -271,25 +268,18 @@ public class NNTrainPatterns : NNForwardPropagation
             // adjust the Hessian.  This is a lengthy operation, since it must process approx 500 labels
             NeedHessian = false;
             CalculateHessian();
-
-
-
         }
         // increment counter for tracking number of backprops
 
         Backprops++;
 
         // determine if it's time to randomize the sequence of training patterns (currently once per epoch)
-
         if ((Backprops % Preferences.ItemsTrainingImages) == 0)
         {
             MnistDataSet.RandomizePatternSequence();
         }
 
         Mutexs[2].ReleaseMutex();
-
-
-
         // forward calculate through the neural net
 
         CalculateNeuralNet(inputVector, iCount, actualOutputVector, oCount, pMemorizedNeuronOutputs, bDistort);
@@ -306,14 +296,7 @@ public class NNTrainPatterns : NNForwardPropagation
         }
         dMSE /= 2.0;
 
-        if (dMSE <= (0.10 * EstimatedCurrentMSE))
-        {
-            bWorthwhileToBackpropagate = false;
-        }
-        else
-        {
-            bWorthwhileToBackpropagate = true;
-        }
+        bWorthwhileToBackpropagate = dMSE > (0.10 * EstimatedCurrentMSE);
 
         if ((bWorthwhileToBackpropagate) && (pMemorizedNeuronOutputs == null))
         {
@@ -336,7 +319,7 @@ public class NNTrainPatterns : NNForwardPropagation
         // use to backpropagate, even if other threads call CalculateNeuralNet() and change the outputs
         // of the neurons
 
-        if ((bWorthwhileToBackpropagate))
+        if (bWorthwhileToBackpropagate)
         {
             Network.Backpropagate(actualOutputVector, targetOutputVector, oCount, pMemorizedNeuronOutputs);
         }
@@ -367,7 +350,6 @@ public class NNTrainPatterns : NNForwardPropagation
         {
             targetOutputVector[i] = 0.0;
             actualOutputVector[i] = 0.0;
-
         }
         //
         double dMSE;
@@ -462,7 +444,7 @@ public class NNTrainPatterns : NNForwardPropagation
             {
                 MSE200 /= 200;
                 s = "MSE:" + MSE200.ToString();
-                MainForm.Invoke(MainForm.DelegateAddObject, [4, s]);
+                MainForm.Invoke(MainForm.DelegateAddText, [4, s]);
                 MSE200 = 0;
                 NN = 0;
             }
@@ -471,13 +453,13 @@ public class NNTrainPatterns : NNForwardPropagation
             // Make synchronous call to main form.
             // MainForm.AddString function runs in main thread.
             // To make asynchronous call use BeginInvoke
-            MainForm?.Invoke(MainForm.DelegateAddObject, new Object[] { 5, s });
+            MainForm?.Invoke(MainForm.DelegateAddText, new Object[] { 5, s });
 
             if (NextPattern >= MnistDataSet.ImagePatterns.Count - 1)
             {
                 Timer.Stop();
                 MSE /= NextPattern;
-                s = String.Format("Completed Epochs:{0}, MisPatterns:{1}, MSE:{2}, Ex. time: {3}, eta:{4} ",
+                s = string.Format("Completed Epochs:{0}, MisPatterns:{1}, MSE:{2}, Ex. time: {3}, eta:{4} ",
                     (EpochsCompleted + 1), 
                     (Misrecognitions),
                     MSE, 
@@ -485,7 +467,7 @@ public class NNTrainPatterns : NNForwardPropagation
                 // Make synchronous call to main form.
                 // MainForm.AddString function runs in main thread.
                 // To make asynchronous call use BeginInvoke
-                MainForm?.Invoke(MainForm.DelegateAddObject, new Object[] { 3, s });
+                MainForm?.Invoke(MainForm.DelegateAddText, new Object[] { 3, s });
                 Misrecognitions = 0;
                 EpochsCompleted++;
                 NextPattern = 0;
@@ -502,7 +484,7 @@ public class NNTrainPatterns : NNForwardPropagation
                 // Make synchronous call to main form.
                 // MainForm.AddString function runs in main thread.
                 // To make asynchronous call use BeginInvoke
-                MainForm?.Invoke(MainForm.DelegateAddObject, [3, s]);
+                MainForm?.Invoke(MainForm.DelegateAddText, [3, s]);
                 // inform main thread that this thread stopped
                 StoppedEvent.Set();
                 Mutexs[3].ReleaseMutex();

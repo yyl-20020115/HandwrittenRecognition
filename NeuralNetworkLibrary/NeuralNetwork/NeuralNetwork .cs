@@ -51,6 +51,7 @@ public class NeuralNetwork : IArchiveSerialization
 
         if (outputVector != null)
         {
+            //Last layer
             lit = Layers[Layers.Count - 1];
 
             for (int ii = 0; ii < oCount; ii++)
@@ -66,7 +67,7 @@ public class NeuralNetwork : IArchiveSerialization
             pNeuronOutputs.Clear();
             // it's empty, so allocate memory for its use
             pNeuronOutputs.Capacity = Layers.Count;
-            foreach (NNLayer nnlit in Layers)
+            foreach (var nnlit in Layers)
             {
                 var layerOut = new NNNeuronOutputs(nnlit.Neurons.Count);
                 for (int ii = 0; ii < nnlit.Neurons.Count; ++ii)
@@ -75,15 +76,20 @@ public class NeuralNetwork : IArchiveSerialization
                 }
                 pNeuronOutputs.Add(layerOut);
             }
-
-
         }
     }
+    /// <summary>
+    /// 反向传播
+    /// </summary>
+    /// <param name="actualOutput"></param>
+    /// <param name="desiredOutput"></param>
+    /// <param name="count"></param>
+    /// <param name="pMemorizedNeuronOutputs"></param>
     public void Backpropagate(double[] actualOutput, double[] desiredOutput, int count, NNNeuronOutputsList pMemorizedNeuronOutputs)
     {
         // backpropagates through the neural net
 
-        if ((Layers.Count >= 2) == false) // there must be at least two layers in the net
+        if (!(Layers.Count >= 2)) // there must be at least two layers in the net
         {
             return;
         }
@@ -135,9 +141,6 @@ public class NeuralNetwork : IArchiveSerialization
 
 
         // store Xlast and reserve memory for the remaining vectors stored in differentials
-
-
-
         for (ii = 0; ii < iSize - 1; ii++)
         {
             var m_differential = new DErrorsList(Layers[ii].Neurons.Count);
@@ -155,7 +158,7 @@ public class NeuralNetwork : IArchiveSerialization
         bool bMemorized = (pMemorizedNeuronOutputs != null);
         for (int jj = iSize - 1; jj > 0; jj--)
         {
-            if (bMemorized != false)
+            if (bMemorized)
             {
                 Layers[jj].Backpropagate(differentials[jj], differentials[jj - 1],
                      pMemorizedNeuronOutputs[jj], pMemorizedNeuronOutputs[jj - 1], EtaLearningRate);
@@ -165,11 +168,7 @@ public class NeuralNetwork : IArchiveSerialization
                 Layers[jj].Backpropagate(differentials[jj], differentials[jj - 1],
                         null, null, EtaLearningRate);
             }
-
-
         }
-
-
         differentials.Clear();
     }
     public void EraseHessianInformation()

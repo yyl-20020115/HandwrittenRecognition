@@ -278,15 +278,15 @@ public class NNForwardPropagation
         int row, col;
         double[] uniformH = new double[Count];
         double[] uniformV = new double[Count];
-        Random rdm = new Random();
+        var rdm = new Random();
 
         for (col = 0; col < Columns; ++col)
         {
             for (row = 0; row < Rows; ++row)
             {
 
-                uniformH[row * Columns + col] = (double)(2.0 * rdm.NextDouble() - 1.0);
-                uniformV[row * Columns + col] = (double)(2.0 * rdm.NextDouble() - 1.0);
+                uniformH[row * Columns + col] = 2.0 * rdm.NextDouble() - 1.0;
+                uniformV[row * Columns + col] = 2.0 * rdm.NextDouble() - 1.0;
             }
         }
 
@@ -357,11 +357,11 @@ public class NNForwardPropagation
 
         // finally, apply a rotation
 
-        double angle = severityFactor * Preferences.MaxRotation * (2.0 * rdm.NextDouble() - 1.0);
+        var angle = severityFactor * Preferences.MaxRotation * (2.0 * rdm.NextDouble() - 1.0);
         angle = angle * 3.1415926535897932384626433832795 / 180.0;  // convert from degrees to radians
 
-        double cosAngle = Math.Cos(angle);
-        double sinAngle = Math.Sin(angle);
+        var cosAngle = Math.Cos(angle);
+        var sinAngle = Math.Sin(angle);
 
         for (row = 0; row < Rows; ++row)
         {
@@ -371,6 +371,5 @@ public class NNForwardPropagation
                 VerticalDistortions[row * Columns + col] = VerticalDistortions[row * Columns + col] - (iMid - row) * (cosAngle - 1) + (col - iMid) * sinAngle;  // negative because of top-down bitmap
             }
         }
-
     }
 }

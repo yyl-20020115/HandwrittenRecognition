@@ -146,7 +146,7 @@
             this.viewHelpToolStripMenuItem.Name = "viewHelpToolStripMenuItem";
             this.viewHelpToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.viewHelpToolStripMenuItem.Text = "About";
-            this.viewHelpToolStripMenuItem.Click += new System.EventHandler(this.viewHelpToolStripMenuItem_Click);
+            this.viewHelpToolStripMenuItem.Click += new System.EventHandler(this.ViewHelpToolStripMenuItem_Click);
             // 
             // splitContainer2
             // 
@@ -285,7 +285,7 @@
             this.radioButtonMnistTestDatabase.TabStop = true;
             this.radioButtonMnistTestDatabase.Text = "Testing Database";
             this.radioButtonMnistTestDatabase.UseVisualStyleBackColor = true;
-            this.radioButtonMnistTestDatabase.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            this.radioButtonMnistTestDatabase.CheckedChanged += new System.EventHandler(this.RadioButton2_CheckedChanged);
             // 
             // radioButtonMnistTrainDatabase
             // 

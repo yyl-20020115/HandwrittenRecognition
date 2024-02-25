@@ -11,7 +11,7 @@ namespace HandwrittenRecogniration;
 
 #region Public Delegates
 // delegates used to call MainForm functions from worker thread
-public delegate void DelegateAddObject(int i, Object s);
+public delegate void DelegateAddText(int i, string s);
 public delegate void DelegateThreadFinished();
 #endregion
 public partial class MainForm : Form
@@ -35,8 +35,6 @@ public partial class MainForm : Form
     /// 
     private int CurrentMnistPattern;
     //static uint _iBackpropThreadIdentifier;  // static member used by threads to identify themselves
-
-
     //
     //Thread
 
@@ -51,7 +49,7 @@ public partial class MainForm : Form
     private List<Thread> TestingThreads;
     // Delegate instances used to cal user interface functions 
     // from worker thread:
-    public DelegateAddObject DelegateAddObject;
+    public DelegateAddText DelegateAddText;
     public DelegateThreadFinished DelegateThreadFinished;
 
     /// <summary>
@@ -79,7 +77,7 @@ public partial class MainForm : Form
         TrainingNN = new ();
         CreateNNNetWork(NN);
         // initialize delegates
-        DelegateAddObject = new (this.AddObject);
+        DelegateAddText = new (this.AddText);
 
         // initialize events
         EventTrainingStopThread = new (false);
@@ -151,40 +149,40 @@ public partial class MainForm : Form
             }
         }
     }
-    private void AddObject(int iCondition, object value)
+    private void AddText(int iCondition, string value)
     {
         switch (iCondition)
         {
             case 1:
-                labelRecognizedValue.Text = (string)value;
+                labelRecognizedValue.Text = value;
                 break;
             case 2:
-                label7.Text = (string)value;
+                label7.Text = value;
                 break;
             case 3:
-                listBoxProgress.Items.Add((string)value);
+                listBoxProgress.Items.Add(value);
                 break;
             case 4:
-                label2.Text = (string)value;
+                label2.Text = value;
                 break;
             case 5:
-                label3.Text = (string)value;
+                label3.Text = value;
                 break;
             case 6:
-                listBox2.Items.Add((string)value);
+                listBox2.Items.Add(value);
                 break;
             case 7:
-                label14.Text = (string)value;
+                label14.Text = value;
                 break;
             case 8:
-                listBox2.Items.Add((string)value);
+                listBox2.Items.Add(value);
                 IsTestingThreadRuning = false;
                 buttonMnistTest.Enabled = true;
                 radioButtonTestingdatabase.Enabled = true;
                 radioButtonTrainingdatabase.Enabled = true;
                 break;
             case 9:
-                label7.Text = (string)value;
+                label7.Text = value;
                 break;
             default:
                 break;
@@ -200,10 +198,10 @@ public partial class MainForm : Form
             {
                 CurrentMnistPattern++;
                 var bitmap = new Bitmap((int)Defaults.Global_ImageSize, (int)Defaults.Global_ImageSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                byte[] pArray = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Pattern;
+                var pArray = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Pattern;
                 uint label = Mnistdatabase.ImagePatterns[CurrentMnistPattern].Label;
                 label6.Text = label.ToString();
-                byte[] colors = new byte[4];
+                var colors = new byte[4];
                 for (int i = 0; i < 28; i++)
                 {
 
@@ -938,7 +936,7 @@ public partial class MainForm : Form
         }
     }
 
-    private void radioButton2_CheckedChanged(object sender, EventArgs e)
+    private void RadioButton2_CheckedChanged(object sender, EventArgs e)
     {
         if (radioButtonMnistTestDatabase.Checked)
         {
@@ -964,14 +962,10 @@ public partial class MainForm : Form
 
     }
 
-    private void viewHelpToolStripMenuItem_Click(object sender, EventArgs e)
+    private void ViewHelpToolStripMenuItem_Click(object sender, EventArgs e)
     {
         MessageBox.Show("Handwritten character recognition program Vesion 0.1,\nCopyright (C) 2010-2011, \nPham Viet Dung, Vietnam Maritime University" +
             "\nEmail:vietdungiitb@vimaru.edu.vn",
             "About Handwritten character recognition program", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
-
-
 }
-
-

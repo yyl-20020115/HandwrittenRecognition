@@ -7,6 +7,5 @@ public class NNConnection(uint iNeuron = 0xffffffff, uint iWeight = 0xffffffff) 
 {
     public uint NeuronIndex = iNeuron;
     public uint WeightIndex = iWeight;
-
     public void Serialize(Archive ar) { }
 }

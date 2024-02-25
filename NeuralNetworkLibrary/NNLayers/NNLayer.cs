@@ -8,7 +8,6 @@ public class NNLayer : IArchiveSerialization
 {
     public NNWeightList Weights { get; private set; }
     public NNNeuronList Neurons { get; private set; }
-
     public string Label;
     public NNLayer PreviousLayer;
     private readonly SigmoidFunction Sigmoid;
@@ -17,17 +16,17 @@ public class NNLayer : IArchiveSerialization
     {
         Label = string.Empty;
         PreviousLayer = null;
-        Sigmoid = new ();
+        Sigmoid = new();
         Weights = [];
         Neurons = [];
         Initialize();
 
     }
-    public NNLayer(string str, NNLayer pPrev /* =NULL */)
+    public NNLayer(string str, NNLayer previous)
     {
         Label = str;
-        PreviousLayer = pPrev;
-        Sigmoid = new ();
+        PreviousLayer = previous;
+        Sigmoid = new();
         Weights = [];
         Neurons = [];
     }
@@ -37,34 +36,47 @@ public class NNLayer : IArchiveSerialization
         Neurons.Clear();
         IsFloatingPointWarning = false;
     }
+    /// <summary>
+    /// 正向推进
+    /// </summary>
     public void Calculate()
     {
-        var dSum = 0.0;
-        foreach (var nit in Neurons)
+        var sum = 0.0;
+        foreach (var neuron in Neurons)
         {
-            foreach (var cit in nit.Connections)
+            foreach (var connection in neuron.Connections)
             {
-                if (cit == nit.Connections[0])
+                if (connection == neuron.Connections[0])
                 {
-                    dSum = (Weights[(int)cit.WeightIndex].Value);
+                    sum = Weights[(int)connection.WeightIndex].Value;
                 }
                 else
                 {
 
-                    dSum += (Weights[(int)cit.WeightIndex].Value) *
-                        (PreviousLayer.Neurons[(int)cit.NeuronIndex].Output);
+                    sum += Weights[(int)connection.WeightIndex].Value *
+                        PreviousLayer.Neurons[(int)connection.NeuronIndex].Output;
                 }
             }
-
-            nit.Output = Sigmoid.SIGMOID(dSum);
+            //每个神经元从将权值和前级的输出相乘，然后计算sigmoid
+            neuron.Output = Sigmoid.SIGMOID(sum);
         }
     }
     /////////////
-    public bool Backpropagate(DErrorsList dErr_wrt_dXn /* in */,
-                        DErrorsList dErr_wrt_dXnm1 /* out */,
-                        NNNeuronOutputs thisLayerOutput,  // memorized values of this layer's output
-                        NNNeuronOutputs prevLayerOutput,  // memorized values of previous layer's output
-                        double etaLearningRate)
+    /// <summary>
+    /// 反向传播
+    /// </summary>
+    /// <param name="dErr_wrt_dXn"></param>
+    /// <param name="dErr_wrt_dXnm1"></param>
+    /// <param name="thisLayerOutput"></param>
+    /// <param name="prevLayerOutput"></param>
+    /// <param name="etaLearningRate"></param>
+    /// <returns></returns>
+    public bool Backpropagate(
+        DErrorsList dErr_wrt_dXn /* in */,
+        DErrorsList dErr_wrt_dXnm1 /* out */,
+        NNNeuronOutputs thisLayerOutput,  // memorized values of this layer's output
+        NNNeuronOutputs prevLayerOutput,  // memorized values of previous layer's output
+        double etaLearningRate)
     {
         // nomenclature (repeated from NeuralNetwork class):
         //
@@ -126,11 +138,11 @@ public class NNLayer : IArchiveSerialization
             // update the differential for the corresponding weight
 
             ii = 0;
-            foreach (var nit in Neurons)
+            foreach (var neuron in Neurons)
             {
-                foreach (var cit in nit.Connections)
+                foreach (var connection in neuron.Connections)
                 {
-                    idx = cit.NeuronIndex;
+                    idx = connection.NeuronIndex;
                     if (idx == 0xffffffff)
                     {
                         output = 1.0;  // this is the bias weight
@@ -146,7 +158,7 @@ public class NNLayer : IArchiveSerialization
                             output = PreviousLayer.Neurons[(int)idx].Output;
                         }
                     }
-                    dErr_wrt_dWn[cit.WeightIndex] += dErr_wrt_dYn[ii] * output;
+                    dErr_wrt_dWn[connection.WeightIndex] += dErr_wrt_dYn[ii] * output;
                 }
 
                 ii++;
@@ -156,18 +168,18 @@ public class NNLayer : IArchiveSerialization
             // For each neuron in this layer
 
             ii = 0;
-            foreach (var nit in Neurons)
+            foreach (var neuron in Neurons)
             {
-                foreach (var cit in nit.Connections)
+                foreach (var connection in neuron.Connections)
                 {
-                    idx = cit.NeuronIndex;
+                    idx = connection.NeuronIndex;
                     if (idx != 0xffffffff)
                     {
                         // we exclude ULONG_MAX, which signifies the phantom bias neuron with
                         // constant output of "1", since we cannot train the bias neuron
 
                         nIndex = (int)idx;
-                        dErr_wrt_dXnm1[nIndex] += dErr_wrt_dYn[ii] * Weights[(int)cit.WeightIndex].Value;
+                        dErr_wrt_dXnm1[nIndex] += dErr_wrt_dYn[ii] * Weights[(int)connection.WeightIndex].Value;
                     }
 
                 }
@@ -230,10 +242,9 @@ public class NNLayer : IArchiveSerialization
         // weights.  The warning message is given only once per layer
         foreach (var wit in Weights)
         {
+            var val = Math.Abs(wit.Value);
 
-            double val = Math.Abs(wit.Value);
-
-            if ((val > 100.0) && (IsFloatingPointWarning == false))
+            if ((val > 100.0) && (!IsFloatingPointWarning))
             {
                 // 100.0 is an arbitrary value, that no reasonable weight should ever exceed
                 /*
@@ -301,7 +312,7 @@ public class NNLayer : IArchiveSerialization
         //   Conveniently, for F = tanh, then F'(Yn) = 1 - Xn^2, i.e., the derivative can be calculated from the output, without knowledge of the input 
 
         int ii, jj;
-        uint kk;
+        uint neuronIndex;
         int nIndex;
         double output;
         double dTemp;
@@ -334,7 +345,7 @@ public class NNLayer : IArchiveSerialization
         // The downside of this is excessive stack usage, and there might be stack overflow probelms.  That's why
         // this comment is labeled "REVIEW"
 
-        double[] d2Err_wrt_dWn = new double[Weights.Count];
+        var d2Err_wrt_dWn = new double[Weights.Count];
         for (ii = 0; ii < Weights.Count; ii++)
         {
             d2Err_wrt_dWn[ii] = 0.0;
@@ -353,26 +364,25 @@ public class NNLayer : IArchiveSerialization
         // update the differential for the corresponding weight
 
         ii = 0;
-        foreach (NNNeuron nit in Neurons)
+        foreach (var neuron in Neurons)
         {
-            foreach (NNConnection cit in nit.Connections)
+            foreach (var connection in neuron.Connections)
             {
                 try
                 {
-
-                    kk = (uint)cit.NeuronIndex;
-                    if (kk == 0xffffffff)
+                    neuronIndex = connection.NeuronIndex;
+                    if (neuronIndex == 0xffffffff)
                     {
                         output = 1.0;  // this is the bias connection; implied neuron output of "1"
                     }
                     else
                     {
-                        output = PreviousLayer.Neurons[(int)kk].Output;
+                        output = PreviousLayer.Neurons[(int)neuronIndex].Output;
                     }
 
                     ////////////	ASSERT( (*cit).WeightIndex < d2Err_wrt_dWn.size() );  // since after changing d2Err_wrt_dWn to a C-style array, the size() function this won't work
                     //d2Err_wrt_dWn[cit.WeightIndex] += d2Err_wrt_dYn[ii] * output * output;
-                    d2Err_wrt_dWn[cit.WeightIndex] = d2Err_wrt_dYn[ii] * output * output;
+                    d2Err_wrt_dWn[connection.WeightIndex] = d2Err_wrt_dYn[ii] * output * output;
                 }
                 catch (Exception)
                 {
@@ -388,20 +398,20 @@ public class NNLayer : IArchiveSerialization
         // For each neuron in this layer
 
         ii = 0;
-        foreach (var nit in Neurons)
+        foreach (var neuron in Neurons)
         {
-            foreach (var cit in nit.Connections)
+            foreach (var connection in neuron.Connections)
             {
                 try
                 {
-                    kk = cit.NeuronIndex;
-                    if (kk != 0xffffffff)
+                    neuronIndex = connection.NeuronIndex;
+                    if (neuronIndex != 0xffffffff)
                     {
                         // we exclude ULONG_MAX, which signifies the phantom bias neuron with
                         // constant output of "1", since we cannot train the bias neuron
 
-                        nIndex = (int)kk;
-                        dTemp = Weights[(int)cit.WeightIndex].Value;
+                        nIndex = (int)neuronIndex;
+                        dTemp = Weights[(int)connection.WeightIndex].Value;
                         d2Err_wrt_dXnm1[nIndex] += d2Err_wrt_dYn[ii] * dTemp * dTemp;
                     }
                 }
@@ -479,9 +489,9 @@ public class NNLayer : IArchiveSerialization
             {
                 //clear neuron list and weight list.
                 Neurons.Clear();
-                Neurons = new (iNumNeurons);
+                Neurons = new(iNumNeurons);
                 Weights.Clear();
-                Weights = new (iNumWeights);
+                Weights = new(iNumWeights);
 
                 for (ii = 0; ii < iNumNeurons; ii++)
                 {
